@@ -4,258 +4,423 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="robots" content="noindex,nofollow">
-<title>Roster Master List</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap">
+<meta name="theme-color" content="#F2F2F7" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
+<title>Class Rep · GCTU MPhil/MSc IT</title>
+<link rel="icon" href="assets/gctu-logo.png">
+<link rel="stylesheet" href="assets/app.css">
 <style>
-:root{
-  color-scheme:light;
-  --bg:#F2F5F4; --surface:#FFFFFF; --surface-2:#F6F9F8; --ink:#101C22; --muted:#5A6A70; --line:#E1E8E5;
-  --hero:#0F2A2C; --hero-ink:#EAF4F1; --hero-muted:#9FC0B8;
-  --accent:#12806A; --accent-ink:#FFFFFF; --accent-soft:#DDF1EA;
-  --gold:#A87B16; --gold-soft:#FBF1DA; --warn:#B24A2F; --warn-soft:#FBE7E0; --grey-soft:#EDF1EF;
-  --display:"Bricolage Grotesque",ui-sans-serif,system-ui,sans-serif;
-  --body:"IBM Plex Sans",ui-sans-serif,system-ui,sans-serif;
-  --mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
-}
-@media (prefers-color-scheme:dark){:root{
-  color-scheme:dark;
-  --bg:#0B1417; --surface:#131F23; --surface-2:#17252A; --ink:#E7F0ED; --muted:#93A6A2; --line:#22333A;
-  --hero:#0E2B2A; --hero-ink:#EAF4F1; --hero-muted:#8DB5AB;
-  --accent:#3FC39F; --accent-ink:#06201A; --accent-soft:#16372F;
-  --gold:#E4B858; --gold-soft:#3A2F17; --warn:#EE8C71; --warn-soft:#3B221C; --grey-soft:#1C2A2F;
-}}
-*{box-sizing:border-box}
-[hidden]{display:none!important}
-html,body{margin:0}
-body{background:var(--bg);color:var(--ink);font:14.5px/1.5 var(--body);-webkit-font-smoothing:antialiased;min-height:100vh}
-header.bar{background:var(--hero);color:var(--hero-ink);padding-inline:16px;padding-block:calc(18px + env(safe-area-inset-top,0px)) 18px}
-.bar-in{max-width:1100px;margin:0 auto;display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between}
-.bar h1{font:800 22px/1.1 var(--display);margin:0;letter-spacing:-.01em}
-.bar .sub{color:var(--hero-muted);font-size:12.5px;margin-top:3px}
-.bar .tools{display:flex;gap:8px;flex-wrap:wrap}
-.wrap{max-width:1100px;margin:0 auto;padding-inline:16px;padding-block:20px 48px;display:flex;flex-direction:column;gap:16px}
-.btn{font:600 14px var(--body);border-radius:10px;padding:9px 14px;border:1.5px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer;display:inline-flex;align-items:center;gap:7px;justify-content:center;white-space:nowrap}
-.btn:hover{border-color:var(--accent)}
-.btn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
-.btn:disabled{opacity:.6;cursor:progress}
-.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
-.bar .btn{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.16);color:var(--hero-ink)}
-.bar .btn:hover{background:rgba(255,255,255,.14)}
-.bar .btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
-
-.login{max-width:400px;margin:10vh auto 0;background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:24px;display:flex;flex-direction:column;gap:14px}
-.login h2{font:800 22px var(--display);margin:0}
-.login p{margin:0;color:var(--muted);font-size:14px}
-.field{display:flex;flex-direction:column;gap:6px}
-.field label{font-size:13px;font-weight:600}
-input[type=password],input[type=search]{font:15px var(--body);padding:11px 13px;border:1.5px solid var(--line);border-radius:10px;background:var(--surface-2);color:var(--ink);width:100%}
-input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 4px var(--accent-soft)}
-.err{background:var(--warn-soft);border-radius:10px;padding:10px 12px;font-size:13.5px}
-
-.tiles{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}
-@media (max-width:820px){.tiles{grid-template-columns:repeat(2,1fr)}}
-.tile{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px 16px;display:flex;flex-direction:column;gap:4px;text-align:left;cursor:pointer;font:inherit;color:inherit}
-.tile:hover{border-color:var(--accent)}
-.tile[aria-pressed="true"]{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
-.tile .k{font-size:12px;color:var(--muted);font-weight:600;display:flex;gap:6px;align-items:center}
-.tile .v{font:800 28px/1 var(--display);font-variant-numeric:tabular-nums}
-.dot{width:8px;height:8px;border-radius:50%}
-.progress{height:10px;border-radius:999px;background:var(--grey-soft);overflow:hidden;display:flex}
-.progress span{display:block;height:100%}
-.pmeta{display:flex;justify-content:space-between;font-size:12.5px;color:var(--muted);margin-top:6px}
-
-.toolbar{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
-.toolbar input{flex:1 1 240px}
-.tablewrap{background:var(--surface);border:1px solid var(--line);border-radius:14px;overflow-x:auto}
-table{width:100%;border-collapse:collapse;min-width:720px}
-th,td{padding:10px 14px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top}
-th{font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);background:var(--surface-2);position:sticky;top:0;cursor:pointer;user-select:none;white-space:nowrap}
-th:hover{color:var(--ink)}
-tr:last-child td{border-bottom:0}
-td.num,td.idx{font:500 13px var(--mono);font-variant-numeric:tabular-nums;white-space:nowrap}
-td.num{color:var(--muted)}
-td.name{font-weight:600}
-td.fix{font-size:13px;color:var(--muted);max-width:320px}
-td.fix b{color:var(--ink);font-weight:600}
-.pill{display:inline-flex;align-items:center;gap:6px;font:600 12px var(--body);padding:4px 10px;border-radius:999px;white-space:nowrap}
-.pill.v{background:var(--accent-soft);color:var(--accent)}
-.pill.c{background:var(--gold-soft);color:var(--gold)}
-.pill.n{background:var(--grey-soft);color:var(--muted)}
-.empty{padding:28px;text-align:center;color:var(--muted)}
-h3{font:800 16px var(--display);margin:8px 0 0}
-.note{font-size:12.5px;color:var(--muted)}
+  body{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
+  /* tab bar: bottom on phones, top segmented on wider screens */
+  .tabs{position:fixed;left:0;right:0;bottom:0;z-index:30;display:grid;grid-template-columns:repeat(3,1fr);
+    padding:6px 8px calc(6px + env(safe-area-inset-bottom,0px));border-top:.5px solid var(--sep);
+    background:color-mix(in srgb,var(--surface) 82%,transparent);backdrop-filter:saturate(180%) blur(20px);-webkit-backdrop-filter:saturate(180%) blur(20px)}
+  .tabs button{border:0;background:none;color:var(--label-3);display:flex;flex-direction:column;align-items:center;gap:3px;min-height:48px;
+    font:500 11px/1 var(--font);cursor:pointer;position:relative;border-radius:10px}
+  .tabs button svg{width:26px;height:26px}
+  .tabs button[aria-current="page"]{color:var(--accent)}
+  .tabs .badge{position:absolute;top:2px;left:calc(50% + 6px);min-width:18px;height:18px;padding:0 5px;border-radius:9px;background:var(--absent);color:#fff;font:600 11px/18px var(--font)}
+  @media (prefers-reduced-transparency:reduce){.tabs{backdrop-filter:none;background:var(--surface)}}
+  @media (min-width:820px){
+    body{padding-bottom:0}
+    .tabs{position:static;display:inline-grid;grid-auto-flow:column;grid-template-columns:none;background:var(--fill);border:0;border-radius:10px;padding:2px;gap:2px;backdrop-filter:none}
+    .tabs button{flex-direction:row;min-height:34px;padding:0 16px;font:600 14px/1 var(--font);color:var(--label);gap:6px}
+    .tabs button svg{width:18px;height:18px}
+    .tabs button[aria-current="page"]{background:var(--surface);color:var(--label);box-shadow:0 1px 3px rgba(0,0,0,.12)}
+    .tabs .badge{position:static}
+  }
+  .topbar{display:flex;align-items:center;justify-content:space-between;gap:var(--s3)}
+  .topbar > .hstack:first-child{min-width:0;flex:1}
+  .topbar .org,.topbar .prog{overflow:hidden;text-overflow:ellipsis}
+  .titlebar{display:flex;align-items:flex-end;justify-content:space-between;gap:var(--s3);flex-wrap:wrap;margin-top:var(--s2)}
+  .titlebar .large-title{margin:var(--s3) 0 0}
+  .tiles{display:grid;grid-template-columns:repeat(4,1fr);gap:var(--s3);margin-top:var(--s4)}
+  @media (max-width:700px){.tiles{grid-template-columns:repeat(2,1fr)}}
+  .tile{background:var(--surface);border-radius:var(--r-card);padding:var(--s3) var(--s4)}
+  .tile .k{font:var(--t-footnote);color:var(--label-3)}
+  .tile .v{font:700 28px/1.15 var(--font);letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+  .counts{display:flex;gap:6px;flex-wrap:wrap}
+  .mini{font:600 12px/1 var(--font);padding:5px 8px;border-radius:999px;font-variant-numeric:tabular-nums}
+  .mini.p{background:var(--present-soft);color:var(--present)} .mini.a{background:var(--absent-soft);color:var(--absent)} .mini.e{background:var(--excused-soft);color:var(--excused)}
+  .search{display:flex;align-items:center;gap:8px;background:var(--fill);border-radius:10px;padding:0 10px;min-height:40px;flex:1 1 220px}
+  .search input{border:0;background:none;font:var(--t-body);color:var(--label);flex:1;min-width:0;outline:none;padding:8px 0}
+  .search svg{color:var(--label-3);flex:none}
+  .stu{flex-wrap:wrap}
+  .stu .who{flex:1 1 200px;min-width:0}
+  .stu .who .n{font:var(--t-body);overflow-wrap:anywhere}
+  .stu .who .i{font:500 13px/1.3 var(--mono);color:var(--label-3)}
+  .stu .seg{flex:0 0 auto}
+  @media (max-width:520px){.stu .seg{flex:1 1 100%}}
+  .savebar{position:sticky;bottom:calc(76px + env(safe-area-inset-bottom,0px));z-index:20;margin-top:var(--s4);padding:var(--s3);border-radius:var(--r-card);
+    background:color-mix(in srgb,var(--surface) 88%,transparent);backdrop-filter:saturate(180%) blur(20px);-webkit-backdrop-filter:saturate(180%) blur(20px);
+    box-shadow:0 8px 30px rgba(0,0,0,.12);display:flex;gap:var(--s3);align-items:center;flex-wrap:wrap}
+  @media (min-width:820px){.savebar{bottom:16px}}
+  @media (max-width:520px){.savebar .btn{flex:1 1 100%}}
+  .savebar .sum{flex:1 1 200px;font:var(--t-subhead);color:var(--label-2)}
+  .savebar .btn{width:auto;min-width:140px}
+  .tablewrap{background:var(--surface);border-radius:var(--r-card);overflow-x:auto}
+  table{width:100%;border-collapse:collapse;min-width:980px;font:var(--t-subhead)}
+  th,td{padding:10px 14px;text-align:left;border-bottom:.5px solid var(--sep);vertical-align:middle}
+  th{font:600 12px/1.2 var(--font);color:var(--label-3);text-transform:uppercase;letter-spacing:.04em;white-space:nowrap;cursor:pointer;background:var(--surface);position:sticky;top:0}
+  tr:last-child td{border-bottom:0}
+  td.n{font-weight:600} td.m{font-family:var(--mono);font-variant-numeric:tabular-nums;white-space:nowrap} td.num{text-align:right;font-variant-numeric:tabular-nums}
+  td a{color:var(--accent);text-decoration:none;overflow-wrap:anywhere}
+  .fb{display:block}
+  .fb .top{display:flex;gap:var(--s2);align-items:center;flex-wrap:wrap}
+  .fb .msg{font:var(--t-callout);margin:6px 0;white-space:pre-wrap;overflow-wrap:anywhere}
+  .fb .meta{font:var(--t-footnote);color:var(--label-3)}
+  .cat{font:600 12px/1 var(--font);padding:5px 9px;border-radius:999px;background:var(--accent-soft);color:var(--accent)}
+  .login{max-width:420px;margin:0 auto}
 </style>
 </head>
 <body>
-
-<div id="loginView" class="wrap">
-  <form class="login" id="loginForm" novalidate>
-    <h2>Master list</h2>
-    <p>Class rep access. Enter the admin password you set in the Apps Script project.</p>
-    <div class="field"><label for="key">Admin password</label><input id="key" type="password" autocomplete="current-password"></div>
-    <div class="err" id="loginErr" hidden></div>
-    <button class="btn primary" id="loginBtn" type="submit">Open master list</button>
-  </form>
-</div>
-
-<div id="appView" hidden>
-  <header class="bar">
-    <div class="bar-in">
-      <div><h1>MSc/MPhil IT · Master list</h1><div class="sub" id="updated">Loading…</div></div>
-      <div class="tools">
-        <button class="btn" id="refresh" type="button">Refresh</button>
-        <button class="btn" id="csv" type="button">Download CSV</button>
-        <button class="btn primary" id="xlsx" type="button">Download Excel</button>
-        <button class="btn" id="logout" type="button">Lock</button>
-      </div>
+<div class="wrap wide">
+  <header class="brand topbar">
+    <div class="hstack" style="gap:var(--s3);flex-wrap:nowrap">
+      <img class="logo" src="assets/gctu-logo.png" alt="GCTU logo" width="44" height="44">
+      <div><div class="org">Class Rep</div><div class="prog">MPhil/MSc. Information Technology · January 2026 Cohort</div></div>
+    </div>
+    <div class="hstack" id="topActions" hidden>
+      <nav class="tabs" id="tabs" aria-label="Sections"></nav>
+      <button class="btn btn-plain" id="lock" type="button">Lock</button>
     </div>
   </header>
-  <div class="wrap">
-    <div class="tiles" id="tiles"></div>
-    <div>
-      <div class="progress" id="bar"></div>
-      <div class="pmeta"><span id="pct"></span><span>Auto-refreshes every minute</span></div>
-    </div>
-    <div class="toolbar">
-      <input type="search" id="q" placeholder="Search name or index number" aria-label="Search">
-    </div>
-    <div class="tablewrap"><table>
-      <thead><tr>
-        <th data-s="no">No.</th><th data-s="name">Name</th><th data-s="idx">Index No.</th><th data-s="status">Status</th><th data-s="date">Date</th><th>Correction requested</th>
-      </tr></thead>
-      <tbody id="tbody"></tbody>
-    </table></div>
-    <div id="missingBox" hidden>
-      <h3>Reported missing from the list</h3>
-      <p class="note">These students entered an index number that isn't on the list. Add them to the Master List tab in the Google Sheet if they belong.</p>
-      <div class="tablewrap"><table><thead><tr><th>Date</th><th>Name</th><th>Index No.</th></tr></thead><tbody id="mbody"></tbody></table></div>
-    </div>
-  </div>
+  <main id="app"></main>
 </div>
 
 <script src="config.js"></script>
+<script src="assets/common.js"></script>
+<script src="assets/timetable.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script>
-const API = (window.ROSTER_API||"").trim();
-const $ = s => document.querySelector(s);
-const esc = s => String(s ?? "").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-let KEY = ""; let DATA = null; let filter = "all"; let sortKey = "name"; let sortDir = 1; let timer = null;
-try{ KEY = sessionStorage.getItem("rosterKey") || ""; }catch(e){}
-
-async function fetchData(key){
-  if(!/^https:\/\/script\.google\.com\//.test(API)) throw new Error("not_configured");
-  const r = await fetch(API,{method:"POST",body:JSON.stringify({action:"admin",key})});
-  return r.json();
-}
-const MSG = {
-  wrong_key:"That password is not correct.",
-  admin_key_not_set:"No admin password is set yet. In Apps Script, add a script property called ADMIN_KEY.",
-  not_configured:"config.js doesn't have the web app URL yet."
+const P=window.Portal, {$, esc}=P;
+const app=$("#app");
+let KEY=""; try{ KEY=sessionStorage.getItem("gctu-admin")||""; }catch(e){}
+let D=null;           // admin data
+let tab="register";
+const STATUSES=["Present","Absent","Excused"];
+const ICON={
+  register:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="2.5"/><path d="M8 8h8M8 12h8M8 16h5"/></svg>`,
+  students:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="9" cy="8" r="3.2"/><path d="M3.5 19c.8-3.2 3-5 5.5-5s4.7 1.8 5.5 5"/><circle cx="17" cy="9" r="2.4"/><path d="M15.8 14.2c2.3.2 3.9 1.8 4.7 4.8"/></svg>`,
+  feedback:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" aria-hidden="true"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3h11A2.5 2.5 0 0 1 20 5.5v8a2.5 2.5 0 0 1-2.5 2.5H10l-4.5 4v-4h0A1.5 1.5 0 0 1 4 14.5z"/></svg>`
 };
+const searchIcon=`<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>`;
 
-$("#loginForm").addEventListener("submit", async e=>{
-  e.preventDefault();
-  const k = $("#key").value; const btn=$("#loginBtn"); const err=$("#loginErr");
-  if(!k){ err.textContent="Enter the admin password."; err.hidden=false; return; }
-  btn.disabled=true; btn.textContent="Checking…"; err.hidden=true;
-  try{
-    const d = await fetchData(k);
-    if(!d.ok){ err.textContent = MSG[d.error] || "Couldn't open the master list."; err.hidden=false; return; }
-    KEY = k; try{ sessionStorage.setItem("rosterKey",k); }catch(e){}
-    show(d);
-  }catch(ex){ err.textContent = MSG[ex.message] || "Couldn't reach the server. Check your connection."; err.hidden=false; }
-  finally{ btn.disabled=false; btn.textContent="Open master list"; }
-});
-
-function show(d){
-  DATA = d; $("#loginView").hidden=true; $("#appView").hidden=false; render();
-  clearInterval(timer); timer = setInterval(refresh, 60000);
-}
-async function refresh(){
-  const b=$("#refresh"); b.disabled=true; b.textContent="Refreshing…";
-  try{ const d=await fetchData(KEY); if(d.ok){ DATA=d; render(); } else if(d.error==="wrong_key") lock(); }
-  catch(e){ $("#updated").textContent = "Couldn't refresh – showing last loaded data"; }
-  finally{ b.disabled=false; b.textContent="Refresh"; }
-}
-function lock(){ KEY=""; try{sessionStorage.removeItem("rosterKey");}catch(e){} clearInterval(timer); DATA=null; $("#appView").hidden=true; $("#loginView").hidden=false; $("#key").value=""; }
-$("#refresh").onclick = refresh;
-$("#logout").onclick = lock;
-
-const STAT = {
-  "Verified":{cls:"v",color:"var(--accent)"},
-  "Correction requested":{cls:"c",color:"var(--gold)"},
-  "Not verified":{cls:"n",color:"var(--muted)"}
-};
-function render(){
-  const rows = DATA.rows;
-  const count = s => rows.filter(r=>r.status===s).length;
-  const v=count("Verified"), c=count("Correction requested"), n=rows.length-v-c;
-  const tiles = [
-    ["all","Total students",rows.length,"var(--ink)"],
-    ["Verified","Verified",v,"var(--accent)"],
-    ["Correction requested","Correction requested",c,"var(--gold)"],
-    ["Not verified","Not verified",n,"var(--muted)"],
-    ["missing","Reported missing",DATA.missing.length,"var(--warn)"]
-  ];
-  $("#tiles").innerHTML = tiles.map(([f,k,val,col])=>`<button class="tile" type="button" data-f="${esc(f)}" aria-pressed="${filter===f}"><span class="k"><span class="dot" style="background:${col}"></span>${k}</span><span class="v">${val}</span></button>`).join("");
-  const pct = x => rows.length ? (x/rows.length*100) : 0;
-  $("#bar").innerHTML = `<span style="width:${pct(v)}%;background:var(--accent)"></span><span style="width:${pct(c)}%;background:var(--gold)"></span>`;
-  $("#pct").textContent = `${Math.round(pct(v+c))}% have responded · ${Math.round(pct(v))}% verified`;
-  $("#updated").textContent = `${rows.length} students · last updated ${DATA.updated}`;
-
-  const q = $("#q").value.trim().toLowerCase();
-  let list = rows.filter(r => (filter==="all"||filter==="missing"||r.status===filter) &&
-    (!q || r.name.toLowerCase().includes(q) || r.idx.includes(q.replace(/\s/g,""))));
-  list = list.slice().sort((a,b)=>{
-    const A=a[sortKey]||"", B=b[sortKey]||"";
-    return (sortKey==="no" ? (+A)-(+B) : String(A).localeCompare(String(B),"en",{sensitivity:"base"})) * sortDir;
+/* ───────── auth ───────── */
+function viewLogin(err=""){
+  $("#topActions").hidden=true;
+  app.innerHTML=`
+  <div class="login fade">
+    <h1 class="large-title">Sign In</h1>
+    <p class="lede">Take the class register, review students and read feedback.</p>
+    <form id="lf" class="stack" novalidate>
+      <div class="field"><label for="key">Admin password</label>
+        <input id="key" class="input" type="password" autocomplete="current-password"></div>
+      <div id="err" class="banner err" ${err?"":"hidden"} role="alert"><span class="ic">!</span><span id="errT">${esc(err)}</span></div>
+      <button class="btn btn-filled" id="go" type="submit">Sign In</button>
+    </form>
+  </div>`;
+  $("#key").focus();
+  $("#lf").addEventListener("submit", async e=>{
+    e.preventDefault();
+    const k=$("#key").value; if(!k){ $("#errT").textContent="Enter the admin password."; $("#err").hidden=false; return; }
+    const b=$("#go"); P.busy(b,true,"Signing in");
+    try{
+      const r=await P.call("POST",{action:"admin", key:k});
+      if(!r.ok) throw new Error(r.error);
+      KEY=k; try{ sessionStorage.setItem("gctu-admin",k); }catch(e){}
+      D=r; startApp();
+    }catch(ex){ $("#errT").textContent=P.errText(ex); $("#err").hidden=false; P.busy(b,false); }
   });
-  $("#tbody").innerHTML = list.length ? list.map(r=>{
-    const s = STAT[r.status]||STAT["Not verified"];
-    const fix = [r.newName?`Name → <b>${esc(r.newName)}</b>`:"", r.newIdx?`Index → <b>${esc(r.newIdx)}</b>`:"", r.note?esc(r.note):""].filter(Boolean).join("<br>");
-    return `<tr><td class="num">${esc(r.no)}</td><td class="name">${esc(r.name)}</td><td class="idx">${esc(r.idx)}</td><td><span class="pill ${s.cls}">${esc(r.status)}</span></td><td class="num">${esc(r.date||"—")}</td><td class="fix">${fix||""}</td></tr>`;
-  }).join("") : `<tr><td colspan="6" class="empty">No students match.</td></tr>`;
-
-  $("#missingBox").hidden = !DATA.missing.length;
-  $("#mbody").innerHTML = DATA.missing.map(m=>`<tr><td class="num">${esc(m.date)}</td><td class="name">${esc(m.name)}</td><td class="idx">${esc(m.idx)}</td></tr>`).join("");
-  if(filter==="missing" && DATA.missing.length) $("#missingBox").scrollIntoView({behavior:"smooth"});
 }
-$("#tiles").addEventListener("click",e=>{const t=e.target.closest(".tile"); if(!t) return; filter = (filter===t.dataset.f && t.dataset.f!=="all") ? "all" : t.dataset.f; render();});
-$("#q").addEventListener("input",render);
-document.querySelectorAll("th[data-s]").forEach(th=>th.addEventListener("click",()=>{const k=th.dataset.s; sortDir = sortKey===k ? -sortDir : 1; sortKey=k; render();}));
+function lock(){ KEY=""; D=null; try{ sessionStorage.removeItem("gctu-admin"); }catch(e){} viewLogin(); }
+async function api(payload){ const r=await P.call("POST",{...payload, key:KEY}); if(!r.ok){ if(r.error==="wrong_key") lock(); throw new Error(r.error); } return r; }
+async function reload(){ D=await api({action:"admin"}); renderTabs(); }
 
-function exportRows(){
-  const main = DATA.rows.map(r=>({"No.":+r.no||r.no,"Name":r.name,"Index No.":r.idx,"Status":r.status,"Date":r.date,"Correct Name":r.newName,"Correct Index No.":r.newIdx,"Note":r.note}));
-  const miss = DATA.missing.map(m=>({"Date":m.date,"Name":m.name,"Index No.":m.idx}));
-  return {main, miss};
+/* ───────── shell ───────── */
+function startApp(){ $("#topActions").hidden=false; $("#lock").onclick=lock; renderTabs(); show(tab); }
+function renderTabs(){
+  const open=(D.feedback||[]).filter(f=>f.status!=="Resolved").length;
+  const items=[["register","Register"],["students","Students"],["feedback","Feedback"]];
+  $("#tabs").innerHTML=items.map(([k,l])=>`<button type="button" data-tab="${k}" ${k===tab?'aria-current="page"':""}>${ICON[k]}<span>${l}</span>${k==="feedback"&&open?`<span class="badge" aria-label="${open} open">${open}</span>`:""}</button>`).join("");
+  $("#tabs").querySelectorAll("button").forEach(b=>b.onclick=()=>show(b.dataset.tab));
 }
-const stamp = () => (DATA.updated||"").replace(/[: ]/g,"-");
-$("#xlsx").onclick = ()=>{
-  if(!window.XLSX){ alertBox("Excel export couldn't load. Use Download CSV instead."); return; }
-  const {main, miss} = exportRows();
-  const wb = XLSX.utils.book_new();
-  const ws = XLSX.utils.json_to_sheet(main); ws["!cols"]=[{wch:5},{wch:34},{wch:14},{wch:22},{wch:17},{wch:30},{wch:16},{wch:40}];
-  XLSX.utils.book_append_sheet(wb, ws, "Master List");
-  const v=DATA.rows.filter(r=>r.status==="Verified").length, c=DATA.rows.filter(r=>r.status==="Correction requested").length;
-  XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet([["Item","Count"],["Total students",DATA.rows.length],["Verified",v],["Correction requested",c],["Not verified",DATA.rows.length-v-c],["Reported missing",miss.length],["Exported",DATA.updated]]), "Summary");
-  if(miss.length) XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(miss), "Missing");
-  XLSX.writeFile(wb, `class-roster-master-list-${stamp()}.xlsx`);
-};
-$("#csv").onclick = ()=>{
-  const {main} = exportRows();
-  const head = Object.keys(main[0]||{"No.":1});
-  const q = v => { v = String(v ?? ""); if(/^[=+\-@]/.test(v)) v="'"+v; return /[",\n]/.test(v) ? `"${v.replace(/"/g,'""')}"` : v; };
-  const csv = "﻿" + [head.join(","), ...main.map(r=>head.map(h=>q(r[h])).join(","))].join("\r\n");
-  const a = document.createElement("a");
-  a.href = URL.createObjectURL(new Blob([csv],{type:"text/csv;charset=utf-8"}));
-  a.download = `class-roster-master-list-${stamp()}.csv`; document.body.appendChild(a); a.click(); a.remove();
-  setTimeout(()=>URL.revokeObjectURL(a.href), 2000);
-};
-function alertBox(t){ $("#updated").textContent = t; }
+function show(t){ tab=t; renderTabs(); ({register:viewRegister, students:viewStudents, feedback:viewFeedback})[t](); window.scrollTo({top:0}); }
 
-if(KEY){ fetchData(KEY).then(d=>{ if(d.ok) show(d); }).catch(()=>{}); }
+/* ───────── register list ───────── */
+let rCourse="";
+function courseOptions(selected, withAll){
+  const TT=window.TIMETABLE, byDay={};
+  TT.courses.forEach(c=>(byDay[c.day]=byDay[c.day]||[]).push(c));
+  const known=new Set(TT.courses.map(TT.label));
+  const extra=(D.courses||[]).filter(c=>!known.has(c));
+  return (withAll?`<option value="">All courses</option>`:"")+
+    [6,0,1,2,3,4,5].filter(d=>byDay[d]).map(d=>`<optgroup label="${TT.DAYS[d]}">${byDay[d].map(c=>`<option value="${esc(TT.label(c))}" ${TT.label(c)===selected?"selected":""}>${esc(TT.label(c))}</option>`).join("")}</optgroup>`).join("")+
+    (extra.length?`<optgroup label="Other">${extra.map(c=>`<option value="${esc(c)}" ${c===selected?"selected":""}>${esc(c)}</option>`).join("")}</optgroup>`:"");
+}
+function courseMeta(name){ const c=window.TIMETABLE.find(name); return c?`${c.lecturer}${c.start?` · ${window.TIMETABLE.DAYS[c.day].slice(0,3)} ${window.TIMETABLE.time(c)}`:""}${c.venue?` · ${c.venue}`:""}`:""; }
+function viewRegister(){
+  const R=D.rows||[];
+  const S=(D.sessions||[]).filter(s=>!rCourse||s.course===rCourse);
+  let p=0,a=0; S.forEach(s=>{p+=s.counts.Present; a+=s.counts.Absent;});
+  const avg=(p+a)?Math.round(p/(p+a)*100)+"%":"–";
+  const last=S[0];
+  app.innerHTML=`
+  <div class="fade">
+    <div class="titlebar">
+      <h1 class="large-title">Register</h1>
+      <div class="hstack">
+        <button class="btn btn-tinted btn-sm" id="xls" type="button">Download Excel</button>
+        <button class="btn btn-filled btn-sm" id="new" type="button">＋ New Class</button>
+      </div>
+    </div>
+    <div class="tiles">
+      <div class="tile"><div class="k">Classes recorded</div><div class="v">${S.length}</div></div>
+      <div class="tile"><div class="k">Average attendance</div><div class="v">${avg}</div></div>
+      <div class="tile"><div class="k">Students</div><div class="v">${R.length}</div></div>
+      <div class="tile"><div class="k">Last class</div><div class="v" style="font-size:20px;line-height:1.7">${last?esc(P.fmtDate(last.date)):"–"}</div></div>
+    </div>
+    <div class="hstack" style="margin-top:var(--s5)">
+      <select id="rc" class="input" style="max-width:420px;min-height:40px;padding:8px 12px" aria-label="Filter by course">${courseOptions(rCourse,true)}</select>
+    </div>
+    <h2 class="section-h">Classes${rCourse?` · ${esc(rCourse.split(" · ")[0])}`:""}</h2>
+    ${S.length?`<div class="group">${S.map(s=>`
+      <button class="row" type="button" data-id="${esc(s.id)}">
+        <div class="grow">
+          <div style="font:var(--t-headline)">${esc(P.fmtDate(s.date,true))}</div>
+          <div class="sub">${esc(s.course)}${s.topic?` · ${esc(s.topic)}`:""}</div>
+          ${courseMeta(s.course)?`<div class="sub" style="font-size:13px">${esc(courseMeta(s.course))}</div>`:""}
+        </div>
+        <div class="counts" aria-label="${s.counts.Present} present, ${s.counts.Absent} absent, ${s.counts.Excused} excused">
+          <span class="mini p">${s.counts.Present} P</span><span class="mini a">${s.counts.Absent} A</span><span class="mini e">${s.counts.Excused} E</span>
+        </div>
+        <svg class="chev" width="8" height="14" viewBox="0 0 8 14" aria-hidden="true"><path d="M1 1l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>`).join("")}</div>`
+    :`<div class="group"><div class="row" style="justify-content:center;color:var(--label-3);padding:28px">${rCourse?"No classes recorded for this course yet.":"No classes yet. Tap New Class to take your first register."}</div></div>`}
+  </div>`;
+  $("#rc").onchange=e=>{ rCourse=e.target.value; viewRegister(); };
+  $("#new").onclick=()=>viewEditor(null);
+  $("#xls").onclick=exportExcel;
+  app.querySelectorAll("[data-id]").forEach(b=>b.onclick=()=>openSession(b.dataset.id));
+}
+function openSession(id){
+  const s=(D.sessions||[]).find(x=>x.id===id); if(!s) return P.toast(P.MSG.not_found);
+  viewEditor(s, (D.matrix||{})[id]||{});
+}
+
+/* ───────── register editor ───────── */
+function viewEditor(session, marks={}){
+  const isNew=!session;
+  const TT=window.TIMETABLE;
+  const sug=TT.suggest(P.today());
+  const s=session||{date:P.today(), course: rCourse || (sug?TT.label(sug):TT.label(TT.courses[0])), topic:""};
+  let courseTouched=!isNew || !!rCourse;
+  const M={...marks};
+  const R=(D.rows||[]).slice().sort((a,b)=>a.name.localeCompare(b.name,"en",{sensitivity:"base"}));
+  let q="", armed=false, delArmed=false;
+  app.innerHTML=`
+  <div class="fade">
+    <button class="btn btn-plain" id="back" type="button" style="padding-left:0">‹ Register</button>
+    <h1 class="large-title" style="margin-top:0">${isNew?"New Class":esc(P.fmtDate(s.date,true))}</h1>
+    <div class="group">
+      <div class="row"><label for="eDate" class="grow">Date</label><input id="eDate" type="date" class="input" style="width:auto;min-height:36px;padding:6px 10px;background:var(--fill)" value="${esc(s.date)}"></div>
+      <div class="row" style="flex-wrap:wrap"><label for="eCourse" style="flex:none;width:72px">Course</label>
+        <select id="eCourse" class="input" style="flex:1 1 220px;width:auto;min-height:36px;padding:6px 10px;background:var(--fill)">${courseOptions(s.course,false)}<option value="__other">Other course…</option></select>
+        <div id="eMeta" class="sub" style="flex-basis:100%;padding-left:84px;font-size:13px"></div></div>
+      <div class="row" id="eOtherRow" hidden><label for="eOther" style="flex:none;width:72px">Name</label><input id="eOther" class="input" maxlength="80" placeholder="Course code and title" style="background:none;padding:0;min-height:24px"></div>
+      <div class="row"><label for="eTopic" style="flex:none;width:72px">Topic</label><input id="eTopic" class="input" maxlength="120" placeholder="Optional" value="${esc(s.topic)}" style="background:none;padding:0;min-height:24px"></div>
+    </div>
+
+    <div class="hstack" style="margin-top:var(--s5)">
+      <label class="search">${searchIcon}<input id="q" type="search" placeholder="Search students" aria-label="Search students"></label>
+      <button class="btn btn-tinted btn-sm" id="allP" type="button">Mark All Present</button>
+      <button class="btn btn-gray btn-sm" id="clear" type="button">Clear</button>
+    </div>
+    <h2 class="section-h" id="listH">Students</h2>
+    <div class="group" id="list"></div>
+
+    <div class="savebar">
+      <div class="sum" id="sum" aria-live="polite"></div>
+      <button class="btn btn-filled" id="save" type="button">Save Register</button>
+    </div>
+    <div id="eerr" class="banner err" hidden role="alert" style="margin-top:var(--s3)"><span class="ic">!</span><span id="eerrT"></span></div>
+    ${isNew?"":`<div style="text-align:center;margin-top:var(--s6)"><button class="btn btn-plain" id="del" type="button" style="color:var(--absent)">Delete This Class</button></div>`}
+  </div>`;
+
+  const list=$("#list");
+  function rowHTML(st){
+    const v=M[st.idx]||"";
+    return `<div class="row stu" data-idx="${esc(st.idx)}">
+      <div class="who"><div class="n">${esc(st.name)}</div><div class="i">${esc(st.idx)}</div></div>
+      <div class="seg att" role="radiogroup" aria-label="Attendance for ${esc(st.name)}">
+        ${STATUSES.map(x=>`<button type="button" role="radio" data-v="${x}" aria-pressed="${v===x}" aria-checked="${v===x}">${x}</button>`).join("")}
+      </div></div>`;
+  }
+  function renderList(){
+    const k=q.toLowerCase();
+    const shown=R.filter(st=>!k||st.name.toLowerCase().includes(k)||st.idx.includes(k));
+    list.innerHTML=shown.length?shown.map(rowHTML).join(""):`<div class="row" style="color:var(--label-3)">No students match “${esc(q)}”.</div>`;
+    $("#listH").textContent=`Students · ${R.length}`;
+  }
+  function renderSum(){
+    const c={Present:0,Absent:0,Excused:0}; R.forEach(st=>{ if(M[st.idx]) c[M[st.idx]]++; });
+    const un=R.length-c.Present-c.Absent-c.Excused;
+    $("#sum").innerHTML=`<span class="mini p">${c.Present} Present</span> <span class="mini a">${c.Absent} Absent</span> <span class="mini e">${c.Excused} Excused</span>${un?` <span style="color:var(--label-3)">· ${un} not marked</span>`:""}`;
+    return un;
+  }
+  list.addEventListener("click",e=>{
+    const b=e.target.closest(".seg button"); if(!b) return;
+    const row=b.closest(".stu"), idx=row.dataset.idx, v=b.dataset.v;
+    M[idx] = M[idx]===v ? "" : v; if(!M[idx]) delete M[idx];
+    row.querySelectorAll(".seg button").forEach(x=>{ const on=x.dataset.v===M[idx]; x.setAttribute("aria-pressed",on); x.setAttribute("aria-checked",on); });
+    armed=false; $("#eerr").hidden=true; renderSum();
+  });
+  $("#q").addEventListener("input",e=>{ q=e.target.value.trim(); renderList(); });
+  $("#allP").onclick=()=>{ R.forEach(st=>{ if(!M[st.idx]) M[st.idx]="Present"; }); renderList(); renderSum(); P.toast("Unmarked students set to Present"); };
+  $("#clear").onclick=()=>{ Object.keys(M).forEach(k=>delete M[k]); renderList(); renderSum(); };
+  $("#back").onclick=()=>show("register");
+  const sel=$("#eCourse");
+  const syncCourse=()=>{ const other=sel.value==="__other"; $("#eOtherRow").hidden=!other; $("#eMeta").textContent=other?"":courseMeta(sel.value); };
+  sel.onchange=()=>{ courseTouched=true; syncCourse(); if(sel.value==="__other") $("#eOther").focus(); };
+  $("#eDate").addEventListener("change",()=>{ if(courseTouched) return; const c=TT.suggest($("#eDate").value); if(c){ sel.value=TT.label(c); syncCourse(); } });
+  syncCourse();
+  const fail=t=>{ $("#eerrT").textContent=t; $("#eerr").hidden=false; };
+
+  $("#save").onclick=async ()=>{
+    const date=$("#eDate").value, course=(sel.value==="__other"?$("#eOther").value:sel.value).trim(), topic=$("#eTopic").value.trim();
+    if(!date) return fail("Pick the date of the class.");
+    if(!course) return fail("Enter the course for this class.");
+    const un=renderSum();
+    if(un && !armed){ armed=true; return fail(`${un} ${un===1?"student isn't":"students aren't"} marked. Mark them, or tap Save Register again to record them as Absent.`); }
+    const marks={...M}; if(un) R.forEach(st=>{ if(!marks[st.idx]) marks[st.idx]="Absent"; });
+    const b=$("#save"); P.busy(b,true,"Saving");
+    try{
+      await api({action:"saveSession", id:session&&session.id, date, course, topic, marks});
+      await reload(); show("register"); P.toast("Register saved");
+    }catch(e){ fail(P.errText(e)); P.busy(b,false); }
+  };
+  if(!isNew) $("#del").onclick=async ()=>{
+    if(!delArmed){ delArmed=true; $("#del").textContent="Tap Again to Delete"; return fail("This deletes the register for this class for everyone. Tap Delete again to confirm."); }
+    const b=$("#del"); P.busy(b,true,"Deleting");
+    try{ await api({action:"deleteSession", id:session.id}); await reload(); show("register"); P.toast("Class deleted"); }
+    catch(e){ fail(P.errText(e)); P.busy(b,false); }
+  };
+  renderList(); renderSum();
+}
+
+/* ───────── students ───────── */
+let sFilter="All", sQ="", sSort={k:"name",d:1};
+function pct(r){ const n=r.present+r.absent; return n?Math.round(r.present/n*100):null; }
+function viewStudents(){
+  const R=D.rows||[];
+  const v=R.filter(r=>r.status==="Verified").length, c=R.filter(r=>r.status==="Correction requested").length;
+  app.innerHTML=`
+  <div class="fade">
+    <div class="titlebar">
+      <h1 class="large-title">Students</h1>
+      <div class="hstack"><button class="btn btn-tinted btn-sm" id="xls" type="button">Download Excel</button></div>
+    </div>
+    <div class="tiles">
+      <div class="tile"><div class="k">On the list</div><div class="v">${R.length}</div></div>
+      <div class="tile"><div class="k">Confirmed details</div><div class="v" style="color:var(--present)">${v}</div></div>
+      <div class="tile"><div class="k">Corrections</div><div class="v" style="color:var(--excused)">${c}</div></div>
+      <div class="tile"><div class="k">Not confirmed</div><div class="v">${R.length-v-c}</div></div>
+    </div>
+    <div class="hstack" style="margin-top:var(--s5)">
+      <label class="search">${searchIcon}<input id="q" type="search" placeholder="Search name, index or email" value="${esc(sQ)}" aria-label="Search students"></label>
+      <div class="seg" role="radiogroup" aria-label="Filter">${["All","Verified","Correction requested","Not verified"].map(f=>`<button type="button" data-f="${f}" aria-pressed="${f===sFilter}">${f==="Correction requested"?"Corrections":f}</button>`).join("")}</div>
+    </div>
+    <div class="tablewrap" style="margin-top:var(--s3)"><table>
+      <thead><tr>${[["name","Name"],["idx","Index No."],["status","Details"],["pct","Attendance"],["present","P"],["absent","A"],["excused","E"],["schoolEmail","School email"],["personalEmail","Personal email"],[null,"Correction"]]
+        .map(([k,l])=>`<th ${k?`data-k="${k}"`:""} scope="col">${l}${sSort.k===k?(sSort.d>0?" ↑":" ↓"):""}</th>`).join("")}</tr></thead>
+      <tbody id="tb"></tbody></table></div>
+  </div>`;
+  const draw=()=>{
+    const k=sQ.toLowerCase();
+    let L=R.filter(r=>(sFilter==="All"||r.status===sFilter)&&(!k||r.name.toLowerCase().includes(k)||r.idx.includes(k)||(r.schoolEmail||"").includes(k)||(r.personalEmail||"").includes(k)));
+    L=L.slice().sort((a,b)=>{ const A=sSort.k==="pct"?(pct(a)??-1):a[sSort.k], B=sSort.k==="pct"?(pct(b)??-1):b[sSort.k];
+      return (typeof A==="number"?A-B:String(A||"").localeCompare(String(B||""),"en",{sensitivity:"base"}))*sSort.d; });
+    $("#tb").innerHTML=L.length?L.map(r=>{
+      const p=pct(r);
+      const pc=r.status==="Verified"?"ok":r.status==="Correction requested"?"warn":"none";
+      const fix=[r.newName?`Name → <b>${esc(r.newName)}</b>`:"",r.newIdx?`Index → <b>${esc(r.newIdx)}</b>`:"",r.note?esc(r.note):""].filter(Boolean).join("<br>");
+      return `<tr><td class="n">${esc(r.name)}</td><td class="m">${esc(r.idx)}</td><td><span class="pill ${pc}">${esc(r.status==="Correction requested"?"Correction":r.status)}</span></td>
+        <td class="num" style="font-weight:600;color:${p==null?"var(--label-3)":p>=75?"var(--present)":p>=50?"var(--excused)":"var(--absent)"}">${p==null?"–":p+"%"}</td>
+        <td class="num">${r.present}</td><td class="num">${r.absent}</td><td class="num">${r.excused}</td>
+        <td>${r.schoolEmail?`<a href="mailto:${esc(r.schoolEmail)}">${esc(r.schoolEmail)}</a>`:"—"}</td>
+        <td>${r.personalEmail?`<a href="mailto:${esc(r.personalEmail)}">${esc(r.personalEmail)}</a>`:"—"}</td>
+        <td style="font:var(--t-footnote);color:var(--label-2)">${fix}</td></tr>`;}).join("")
+      :`<tr><td colspan="10" style="text-align:center;color:var(--label-3);padding:28px">No students match.</td></tr>`;
+  };
+  $("#q").addEventListener("input",e=>{ sQ=e.target.value.trim(); draw(); });
+  app.querySelectorAll(".seg [data-f]").forEach(b=>b.onclick=()=>{ sFilter=b.dataset.f; viewStudents(); });
+  app.querySelectorAll("th[data-k]").forEach(th=>th.onclick=()=>{ const k=th.dataset.k; sSort={k, d: sSort.k===k?-sSort.d:1}; viewStudents(); });
+  $("#xls").onclick=exportExcel;
+  draw();
+}
+
+/* ───────── feedback ───────── */
+let fFilter="Open";
+function viewFeedback(){
+  const F=D.feedback||[];
+  const L=F.filter(f=>fFilter==="All"||(fFilter==="Open"?f.status!=="Resolved":f.status==="Resolved"));
+  app.innerHTML=`
+  <div class="fade">
+    <div class="titlebar">
+      <h1 class="large-title">Feedback</h1>
+      <div class="seg" role="radiogroup" aria-label="Filter">${["Open","Resolved","All"].map(f=>`<button type="button" data-f="${f}" aria-pressed="${f===fFilter}">${f}</button>`).join("")}</div>
+    </div>
+    <p class="lede" style="margin-top:var(--s2)">Every message is also emailed to you. Reply from your inbox, then mark it resolved here.</p>
+    ${L.length?`<div class="group">${L.map(f=>`
+      <div class="row fb">
+        <div class="top"><span class="cat">${esc(f.category)}</span><strong>${esc(f.name)}</strong><span class="mono" style="color:var(--label-3);font-size:13px">${esc(f.idx)}</span>
+          <span style="margin-left:auto" class="pill ${f.status==="Resolved"?"ok":"warn"}">${esc(f.status)}</span></div>
+        <div class="msg">${esc(f.details||"(no details)")}</div>
+        <div class="meta">${esc(f.date)}${f.session?` · Class: ${esc(f.session)}`:""}${f.contact?` · <a href="mailto:${esc(f.contact)}">${esc(f.contact)}</a>`:""}</div>
+        <div style="margin-top:8px"><button class="btn btn-sm ${f.status==="Resolved"?"btn-gray":"btn-tinted"}" type="button" data-row="${f.row}" data-to="${f.status==="Resolved"?"Open":"Resolved"}">${f.status==="Resolved"?"Reopen":"Mark Resolved"}</button></div>
+      </div>`).join("")}</div>`
+    :`<div class="group"><div class="row" style="justify-content:center;color:var(--label-3);padding:28px">${fFilter==="Open"?"No open feedback. You're all caught up.":"Nothing here yet."}</div></div>`}
+  </div>`;
+  app.querySelectorAll(".seg [data-f]").forEach(b=>b.onclick=()=>{ fFilter=b.dataset.f; viewFeedback(); });
+  app.querySelectorAll("[data-row]").forEach(b=>b.onclick=async ()=>{
+    P.busy(b,true,"Saving");
+    try{ await api({action:"setFeedback", row:+b.dataset.row, status:b.dataset.to}); const f=F.find(x=>x.row===+b.dataset.row); if(f) f.status=b.dataset.to; renderTabs(); viewFeedback(); }
+    catch(e){ P.toast(P.errText(e)); P.busy(b,false); }
+  });
+}
+
+/* ───────── export ───────── */
+async function exportExcel(){
+  if(!window.XLSX){ P.toast("Excel export couldn't load. Check your connection."); return; }
+  const btn=$("#xls"); P.busy(btn,true,"Preparing");
+  try{
+    const S=(D.sessions||[]).slice().reverse(); // oldest first
+    const R=(D.rows||[]).slice().sort((a,b)=>a.name.localeCompare(b.name,"en",{sensitivity:"base"}));
+    const marks=D.matrix||{};
+    const reg=[["Name","Index No.",...S.map(s=>`${s.date} ${s.course}`),"Present","Absent","Excused","Attendance %"]];
+    R.forEach(r=>{ let p=0,a=0,e=0; const cells=S.map(s=>{ const v=(marks[s.id]||{})[r.idx]||""; if(v==="Present")p++; else if(v==="Absent")a++; else if(v==="Excused")e++; return v?v[0]:""; });
+      reg.push([r.name,r.idx,...cells,p,a,e,(p+a)?Math.round(p/(p+a)*100)+"%":""]); });
+    const wb=XLSX.utils.book_new();
+    const ws1=XLSX.utils.aoa_to_sheet(reg); ws1["!cols"]=[{wch:32},{wch:13},...S.map(()=>({wch:12})),{wch:8},{wch:8},{wch:8},{wch:12}];
+    XLSX.utils.book_append_sheet(wb,ws1,"Register");
+    const courses=[...new Set(S.map(s=>s.course))];
+    const bc=[["Name","Index No.",...courses.map(c=>c.split(" · ")[0]+" %"),"Overall %"]];
+    R.forEach(r=>{ let tp=0,ta=0; const cells=courses.map(c=>{ let p=0,a=0; S.filter(s=>s.course===c).forEach(s=>{ const v=(marks[s.id]||{})[r.idx]; if(v==="Present")p++; else if(v==="Absent")a++; }); tp+=p; ta+=a; return (p+a)?Math.round(p/(p+a)*100):""; });
+      bc.push([r.name,r.idx,...cells,(tp+ta)?Math.round(tp/(tp+ta)*100):""]); });
+    const ws2=XLSX.utils.aoa_to_sheet(bc); ws2["!cols"]=[{wch:32},{wch:13},...courses.map(()=>({wch:12})),{wch:10}];
+    XLSX.utils.book_append_sheet(wb,ws2,"By Course");
+    XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(S.map(s=>({Date:s.date,Course:s.course,Lecturer:(window.TIMETABLE.find(s.course)||{}).lecturer||"",Topic:s.topic,Present:s.counts.Present,Absent:s.counts.Absent,Excused:s.counts.Excused}))),"Classes");
+    XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(R.map(r=>({Name:r.name,"Index No.":r.idx,Details:r.status,"Confirmed On":r.date,"Correct Name":r.newName,"Correct Index No.":r.newIdx,Note:r.note,"School Email":r.schoolEmail,"Personal Email":r.personalEmail,Present:r.present,Absent:r.absent,Excused:r.excused,"Attendance %":pct(r)==null?"":pct(r)+"%"}))),"Students");
+    XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet((D.feedback||[]).map(f=>({Date:f.date,"Index No.":f.idx,Name:f.name,Category:f.category,Details:f.details,Class:f.session,Contact:f.contact,Status:f.status}))),"Feedback");
+    XLSX.writeFile(wb,`GCTU-MSc-IT-Jan2026-register-${P.today()}.xlsx`);
+  }catch(e){ P.toast(P.errText(e)); }
+  finally{ P.busy(btn,false); }
+}
+
+/* ───────── start ───────── */
+P.mountLogo();
+if(KEY){ api({action:"admin"}).then(r=>{ D=r; startApp(); }).catch(()=>viewLogin()); app.innerHTML=`<p class="lede" style="margin-top:var(--s6)">Loading…</p>`; }
+else viewLogin();
 </script>
 </body>
 </html>

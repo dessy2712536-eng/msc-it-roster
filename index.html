@@ -3,307 +3,424 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>MSc/MPhil IT Class Roster</title>
-<meta name="description" content="Enter your index number to verify your details on the MSc/MPhil IT class list.">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap">
+<meta name="theme-color" content="#F2F2F7" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
+<title>Class Portal · GCTU MPhil/MSc IT</title>
+<meta name="description" content="Check your attendance and confirm your details – GCTU MPhil/MSc Information Technology, January 2026 cohort.">
+<link rel="icon" href="assets/gctu-logo.png">
+<link rel="apple-touch-icon" href="assets/gctu-logo.png">
+<link rel="stylesheet" href="assets/app.css">
 <style>
-:root{
-  color-scheme:light;
-  --bg:#F2F5F4; --surface:#FFFFFF; --surface-2:#F6F9F8; --ink:#101C22; --muted:#5A6A70; --line:#E1E8E5;
-  --hero:#0F2A2C; --hero-ink:#EAF4F1; --hero-muted:#9FC0B8;
-  --accent:#12806A; --accent-ink:#FFFFFF; --accent-soft:#DDF1EA;
-  --gold:#C99A2E; --gold-soft:#FBF1DA; --warn:#B24A2F; --warn-soft:#FBE7E0;
-  --shadow:0 1px 2px rgba(16,28,34,.05),0 12px 32px rgba(16,28,34,.09);
-  --display:"Bricolage Grotesque",ui-sans-serif,system-ui,sans-serif;
-  --body:"IBM Plex Sans",ui-sans-serif,system-ui,sans-serif;
-  --mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
-}
-@media (prefers-color-scheme:dark){:root{
-  color-scheme:dark;
-  --bg:#0B1417; --surface:#131F23; --surface-2:#17252A; --ink:#E7F0ED; --muted:#93A6A2; --line:#22333A;
-  --hero:#0E2B2A; --hero-ink:#EAF4F1; --hero-muted:#8DB5AB;
-  --accent:#3FC39F; --accent-ink:#06201A; --accent-soft:#16372F;
-  --gold:#E4B858; --gold-soft:#3A2F17; --warn:#EE8C71; --warn-soft:#3B221C;
-  --shadow:0 1px 2px rgba(0,0,0,.3),0 12px 32px rgba(0,0,0,.4);
-}}
-*{box-sizing:border-box}
-[hidden]{display:none!important}
-html,body{margin:0}
-body{background:var(--bg);color:var(--ink);font:15px/1.55 var(--body);-webkit-font-smoothing:antialiased;min-height:100vh;padding-bottom:env(safe-area-inset-bottom,0px)}
-.hero{background:var(--hero);color:var(--hero-ink);padding-inline:16px;padding-block:calc(40px + env(safe-area-inset-top,0px)) 96px;position:relative;overflow:hidden}
-.hero::before{content:"";position:absolute;inset:0;background-image:radial-gradient(rgba(255,255,255,.07) 1px,transparent 1px);background-size:18px 18px;mask-image:linear-gradient(120deg,transparent 30%,#000 100%);-webkit-mask-image:linear-gradient(120deg,transparent 30%,#000 100%)}
-.hero-in{max-width:560px;margin:0 auto;position:relative;display:flex;flex-direction:column;gap:12px}
-.eyebrow{align-self:flex-start;font:600 11.5px/1 var(--body);letter-spacing:.12em;text-transform:uppercase;color:var(--gold);background:rgba(228,184,88,.12);padding:7px 11px;border-radius:999px}
-h1{font:800 clamp(30px,7vw,44px)/1.04 var(--display);margin:0;letter-spacing:-.02em;text-wrap:balance}
-.lede{margin:0;color:var(--hero-muted);max-width:52ch;font-size:15.5px}
-
-main{max-width:560px;margin:-64px auto 0;padding-inline:16px;padding-block:0 48px;position:relative;display:flex;flex-direction:column;gap:16px}
-.panel{background:var(--surface);border:1px solid var(--line);border-radius:22px;padding:22px;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:16px}
-.panel h2{font:800 22px/1.2 var(--display);margin:0;letter-spacing:-.01em;text-wrap:balance}
-.sub{margin:0;color:var(--muted);font-size:14px}
-.stack{display:flex;flex-direction:column;gap:12px}
-.field{display:flex;flex-direction:column;gap:6px}
-.field label{font-size:13px;font-weight:600}
-.field input,.field textarea{font:15px var(--body);padding:12px 14px;border:1.5px solid var(--line);border-radius:12px;background:var(--surface-2);color:var(--ink);width:100%}
-.field input:focus,.field textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 4px var(--accent-soft)}
-#idx{font:500 24px var(--mono);letter-spacing:.14em;text-align:center;padding:16px 14px;font-variant-numeric:tabular-nums}
-#idx::placeholder{color:color-mix(in srgb,var(--muted) 55%,transparent);letter-spacing:.14em}
-.hint{font-size:12.5px;color:var(--muted);text-align:center}
-
-.btn{font:600 15px var(--body);border-radius:12px;padding:13px 16px;border:1.5px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer;display:inline-flex;align-items:center;gap:8px;justify-content:center;transition:transform .1s,border-color .15s,background .15s,filter .15s;width:100%}
-.btn:active{transform:scale(.985)}
-.btn:hover{border-color:var(--accent)}
-.btn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
-.btn:disabled{opacity:.6;cursor:progress}
-.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
-.btn.primary:hover{filter:brightness(1.06)}
-.btn.warn{color:var(--warn);border-color:color-mix(in srgb,var(--warn) 45%,transparent)}
-.btn.warn:hover{background:var(--warn-soft);border-color:var(--warn)}
-.btn.link{border:0;background:none;color:var(--muted);padding:6px;width:auto;align-self:center;font-size:14px}
-.btn.link:hover{color:var(--accent)}
-.row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-@media (max-width:420px){.row2{grid-template-columns:1fr}}
-.spin{width:16px;height:16px;border-radius:50%;border:2px solid currentColor;border-right-color:transparent;animation:sp .7s linear infinite}
-@keyframes sp{to{transform:rotate(360deg)}}
-
-.idcard{border-radius:18px;background:linear-gradient(135deg,var(--hero),color-mix(in srgb,var(--hero) 68%,var(--accent)));color:var(--hero-ink);padding:20px;display:flex;flex-direction:column;gap:16px;position:relative;overflow:hidden}
-.idcard::after{content:"";position:absolute;right:-44px;top:-44px;width:150px;height:150px;border-radius:50%;border:24px solid rgba(255,255,255,.06)}
-.idcard .top{display:flex;gap:14px;align-items:center}
-.avatar{flex:none;width:52px;height:52px;border-radius:15px;display:grid;place-items:center;font:700 18px var(--display);background:rgba(255,255,255,.12);color:#fff}
-.lbl{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--hero-muted)}
-.nm{font:700 20px/1.25 var(--display);overflow-wrap:anywhere}
-.num{font:500 24px var(--mono);letter-spacing:.06em;font-variant-numeric:tabular-nums}
-.num .pre{opacity:.6}
-.badge{align-self:flex-start;font:600 12px var(--body);padding:5px 10px;border-radius:999px;display:inline-flex;gap:6px;align-items:center}
-.badge.ok{background:var(--accent-soft);color:var(--accent)}
-.badge.pend{background:var(--gold-soft);color:var(--gold)}
-.badge.none{background:var(--surface-2);color:var(--muted);border:1px solid var(--line)}
-
-.status{border-radius:14px;padding:14px;font-size:14px;display:flex;gap:12px;align-items:flex-start}
-.status.ok{background:var(--accent-soft)}
-.status.bad{background:var(--warn-soft)}
-.status .dot{flex:none;width:24px;height:24px;border-radius:50%;display:grid;place-items:center;font:700 13px var(--body);color:#fff}
-.status.ok .dot{background:var(--accent)}
-.status.bad .dot{background:var(--warn)}
-.done{align-items:center;text-align:center}
-.done .big{width:72px;height:72px;border-radius:50%;display:grid;place-items:center;background:var(--accent-soft);color:var(--accent)}
-.done .big.pend{background:var(--gold-soft);color:var(--gold)}
-.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:0;padding:0;list-style:none}
-.steps li{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px;font-size:12.5px;color:var(--muted);display:flex;flex-direction:column;gap:6px}
-.steps b{font:800 13px var(--display);color:var(--accent)}
-@media (max-width:420px){.steps{grid-template-columns:1fr}}
-footer{text-align:center;font-size:12px;color:var(--muted)}
-@media (prefers-reduced-motion:no-preference){.panel{animation:up .25s cubic-bezier(.2,.8,.2,1)}@keyframes up{from{transform:translateY(10px);opacity:.5}}}
+  .profile{display:flex;align-items:center;gap:var(--s4);padding:var(--s4)}
+  .avatar{width:56px;height:56px;border-radius:50%;background:var(--accent-soft);color:var(--accent);display:grid;place-items:center;font:700 20px/1 var(--font);flex:none}
+  .profile .nm{font:var(--t-title3);letter-spacing:-.01em;overflow-wrap:anywhere}
+  .profile .ix{font:500 15px/1.3 var(--mono);color:var(--label-3);letter-spacing:.04em;margin-top:2px}
+  .ringcard{display:grid;grid-template-columns:auto 1fr;gap:var(--s5);align-items:center;padding:var(--s5) var(--s4)}
+  .ring{width:120px;height:120px;position:relative}
+  .ring svg{width:100%;height:100%;transform:rotate(-90deg)}
+  .ring .pct{position:absolute;inset:0;display:grid;place-items:center;text-align:center}
+  .ring .pct b{display:block;font:700 28px/1 var(--font);letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+  .ring .pct span{font:var(--t-caption);color:var(--label-3)}
+  .legend{display:flex;flex-direction:column;gap:10px}
+  .legend div{display:flex;align-items:center;gap:var(--s2);font:var(--t-subhead);color:var(--label-2)}
+  .legend i{width:10px;height:10px;border-radius:50%;flex:none}
+  .legend b{font:600 17px/1 var(--font);color:var(--label);font-variant-numeric:tabular-nums;margin-left:auto}
+  .legend .total{font:var(--t-footnote);color:var(--label-3);padding-top:6px;border-top:.5px solid var(--sep)}
+  .ring-arc{transition:stroke-dashoffset 1s var(--ease)}
+  @media (prefers-reduced-motion:reduce){.ring-arc{transition:none}}
+  .cls .d{font:var(--t-headline)}
+  .choice{cursor:pointer}
+  .choice .tick{color:var(--accent);visibility:hidden;font-weight:700}
+  .choice[aria-checked="true"] .tick{visibility:visible}
+  .bar{height:6px;border-radius:3px;background:var(--fill);overflow:hidden;margin-top:6px}
+  .bar i{display:block;height:100%;border-radius:3px}
+  .crow .pc{font:600 17px/1 var(--font);font-variant-numeric:tabular-nums;min-width:48px;text-align:right}
+  .next{display:flex;gap:var(--s3);align-items:center;padding:var(--s3) var(--s4)}
+  .next .dot{width:10px;height:10px;border-radius:50%;background:var(--accent);flex:none}
+  .next.live .dot{background:var(--present);box-shadow:0 0 0 4px var(--present-soft)}
+  .tt .time{font:600 15px/1.3 var(--font);font-variant-numeric:tabular-nums;min-width:132px;color:var(--label-2)}
+  .tt.now{background:var(--accent-soft)}
+  @media (max-width:420px){.tt{flex-wrap:wrap}.tt .time{min-width:0;flex-basis:100%}}
+  .empty{padding:var(--s6) var(--s4);text-align:center;color:var(--label-3);font:var(--t-subhead)}
+  @media (max-width:380px){.ringcard{grid-template-columns:1fr;justify-items:center}.legend{width:100%}}
 </style>
 </head>
 <body>
-<section class="hero">
-  <div class="hero-in">
-    <span class="eyebrow">MSc / MPhil Information Technology</span>
-    <h1>Verify your class details</h1>
-    <p class="lede">Enter your index number to see how you appear on the class list, then confirm it or tell us what to fix.</p>
-  </div>
-</section>
+<div class="wrap">
+  <header class="brand">
+    <img class="logo" src="assets/gctu-logo.png" alt="GCTU logo" width="44" height="44">
+    <div>
+      <div class="org">Ghana Communication Technology University</div>
+      <div class="prog">MPhil/MSc. Information Technology · January 2026 Cohort</div>
+    </div>
+  </header>
 
-<main>
-  <div class="panel" id="panel"></div>
-  <ol class="steps" id="steps">
-    <li><b>1</b>Enter your 10-digit index number</li>
-    <li><b>2</b>Check your name and number</li>
-    <li><b>3</b>Confirm or request a correction</li>
-  </ol>
-  <footer>Your response is recorded on the class master list.</footer>
-</main>
+  <main id="app" aria-live="polite"></main>
+  <p class="footer">Class Portal · Responses go to the class rep and are kept on the class register.</p>
+</div>
 
 <script src="config.js"></script>
+<script src="assets/common.js"></script>
+<script src="assets/timetable.js"></script>
 <script>
-const API_URL = (window.ROSTER_API || "").trim();
+const P = window.Portal, {$, esc} = P;
+const app = $("#app");
+let me = null;
+const KEY = "gctu-idx";
+const store = { get(){ try{return localStorage.getItem(KEY)||"";}catch(e){return "";} },
+                set(v){ try{ v?localStorage.setItem(KEY,v):localStorage.removeItem(KEY);}catch(e){} } };
 
-const $ = s => document.querySelector(s);
-const esc = s => String(s ?? "").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-const fmtIdx = i => `<span class="pre">${esc(i.slice(0,4))} ${esc(i.slice(4,7))}</span> ${esc(i.slice(7))}`;
-const initials = n => n.replace(/[^A-Za-z\s-]/g,"").split(/[\s-]+/).filter(Boolean).map(w=>w[0]).slice(0,2).join("").toUpperCase();
-const configured = /^https:\/\/script\.google\.com\//.test(API_URL);
-const panel = $("#panel");
-let current = null;
-
-async function api(method, payload){
-  if(!configured) throw new Error("not_configured");
-  const ctrl = new AbortController(); const t = setTimeout(()=>ctrl.abort(), 20000);
-  try{
-    const res = method==="GET"
-      ? await fetch(API_URL+"?action=lookup&idx="+encodeURIComponent(payload), {signal:ctrl.signal})
-      : await fetch(API_URL, {method:"POST", body:JSON.stringify(payload), signal:ctrl.signal});
-    return await res.json();
-  } finally { clearTimeout(t); }
-}
-function busy(btn, on, label){
-  btn.disabled = on;
-  btn.innerHTML = on ? `<span class="spin"></span>${label||"Please wait…"}` : btn.dataset.label;
-}
-function netError(e){
-  return e.message==="not_configured"
-    ? "This page isn't connected to the master list yet. The class rep needs to add the web app link."
-    : "Couldn't reach the class list. Check your internet connection and try again.";
-}
-function badge(status, when){
-  if(status==="Verified") return `<span class="badge ok">✓ Verified${when?` on ${esc(when)}`:""}</span>`;
-  if(status==="Correction requested") return `<span class="badge pend">● Correction requested${when?` on ${esc(when)}`:""}</span>`;
-  return `<span class="badge none">Not yet verified</span>`;
-}
-
-/* ---------- screens ---------- */
-function screenLookup(prefill="", error=""){
-  $("#steps").hidden = false;
-  panel.innerHTML = `
-    <h2>Find your details</h2>
-    <form id="f" class="stack" novalidate>
-      <div class="field">
-        <label for="idx">Index number</label>
-        <input id="idx" inputmode="numeric" autocomplete="off" maxlength="14" placeholder="2526500000" value="${esc(prefill)}">
-        <span class="hint">Digits only, as printed on your student ID</span>
+/* ───────── lookup ───────── */
+function viewLookup(prefill="", error=""){
+  me = null;
+  app.innerHTML = `
+    <div class="fade">
+      <h1 class="large-title">Class Portal</h1>
+      <p class="lede">Check your attendance after each class, confirm your name and index number, and report anything that's wrong.</p>
+      <form id="f" class="stack" novalidate>
+        <div class="field">
+          <label for="idx">Index number</label>
+          <input id="idx" class="input big" inputmode="numeric" autocomplete="off" maxlength="14" placeholder="2526500000" value="${esc(prefill)}" aria-describedby="idxHint">
+          <span class="hint" id="idxHint">Digits only, as printed on your student ID.</span>
+        </div>
+        <div id="err" class="banner err" ${error?"":"hidden"} role="alert"><span class="ic">!</span><span id="errT">${esc(error)}</span></div>
+        <button class="btn btn-filled" id="go" type="submit">Continue</button>
+      </form>
+      <div class="hstack" style="justify-content:center;margin-top:var(--s3)">
+        <button class="btn btn-plain" id="missing" type="button">Not on the class list?</button>
       </div>
-      <div id="err" class="status bad" ${error?"":"hidden"}><span class="dot">!</span><span id="errT">${esc(error)}</span></div>
-      <button class="btn primary" id="go" data-label="Show my details" type="submit">Show my details</button>
-    </form>`;
-  const inp = $("#idx");
-  inp.focus({preventScroll:true});
-  inp.addEventListener("input",()=>{inp.value=inp.value.replace(/[^\d\s]/g,"");});
-  $("#f").addEventListener("submit", async e=>{
-    e.preventDefault();
-    const idx = inp.value.replace(/\s+/g,"");
-    const fail = t => { $("#errT").textContent=t; $("#err").hidden=false; };
-    if(!/^\d{8,12}$/.test(idx)) return fail("Enter your full index number using digits only (usually 10 digits).");
-    const btn=$("#go"); busy(btn,true,"Looking you up…");
-    try{
-      const r = await api("GET", idx);
-      if(!r.ok) return fail("That doesn't look like a valid index number.");
-      if(!r.found) return screenNotFound(idx);
-      current = r; screenDetails();
-    }catch(err){ fail(netError(err)); }
-    finally{ if(document.body.contains(btn)) busy(btn,false); }
-  });
-}
-
-function screenNotFound(idx){
-  panel.innerHTML = `
-    <h2>No match for ${esc(idx)}</h2>
-    <p class="sub">Check the number and try again. If it's correct and you're in this class, report it so you can be added.</p>
-    <div class="row2">
-      <button class="btn" id="retry" type="button">Try another number</button>
-      <button class="btn primary" id="rep" type="button">I'm missing from the list</button>
     </div>`;
-  $("#retry").onclick = ()=>screenLookup(idx);
-  $("#rep").onclick = ()=>screenMissing(idx);
+  const inp=$("#idx");
+  inp.addEventListener("input",()=>{ inp.value=inp.value.replace(/[^\d\s]/g,""); $("#err").hidden=true; });
+  if(!prefill) inp.focus({preventScroll:true});
+  $("#missing").onclick=()=>sheetMissing(inp.value.replace(/\s+/g,""));
+  $("#f").addEventListener("submit", e=>{ e.preventDefault(); lookup(inp.value.replace(/\s+/g,""), $("#go")); });
 }
 
-function screenDetails(){
-  $("#steps").hidden = true;
-  const {name, idx, status, verifiedOn} = current;
-  const already = status==="Verified" || status==="Correction requested";
-  panel.innerHTML = `
-    <h2>${already ? "Your details" : "Is this you?"}</h2>
-    <p class="sub">Check every letter of your name and every digit of your index number.</p>
-    <div class="idcard">
-      <div class="top"><span class="avatar">${esc(initials(name))}</span>
-        <div><div class="lbl">Full name</div><div class="nm">${esc(name)}</div></div></div>
-      <div><div class="lbl">Index number</div><div class="num">${fmtIdx(idx)}</div></div>
-    </div>
-    ${badge(status, verifiedOn)}
-    <div id="err" class="status bad" hidden><span class="dot">!</span><span id="errT"></span></div>
-    <div class="row2">
-      <button class="btn primary" id="ok" data-label="Yes, this is correct" type="button">Yes, this is correct</button>
-      <button class="btn warn" id="bad" type="button">Something is wrong</button>
-    </div>
-    <button class="btn link" id="back" type="button">← Not you? Enter a different number</button>`;
-  $("#back").onclick = ()=>screenLookup();
-  $("#bad").onclick = screenCorrection;
-  $("#ok").onclick = async ()=>{
-    const btn=$("#ok"); busy(btn,true,"Saving…");
-    try{
-      const r = await api("POST",{action:"confirm", idx});
-      if(!r.ok) throw new Error(r.error);
-      screenDone("ok", "You're verified", `Thanks, ${esc(name.split(" ")[0])}. Your details have been marked as correct on the class list.`);
-    }catch(err){ $("#errT").textContent=netError(err); $("#err").hidden=false; busy(btn,false); }
-  };
+async function lookup(idx, btn){
+  const fail = t => { if($("#errT")){ $("#errT").textContent=t; $("#err").hidden=false; } else viewLookup(idx, t); };
+  if(!/^\d{8,12}$/.test(idx)) return fail("Enter your full index number using digits only (usually 10 digits).");
+  P.busy(btn,true,"Looking you up");
+  try{
+    const r = await P.call("GET",{action:"lookup", idx});
+    if(!r.ok) return fail(P.errText(r.error));
+    if(!r.found){ store.set(""); return viewNotFound(idx); }
+    me = r; store.set(idx); viewHome();
+  }catch(e){ fail(P.errText(e)); }
+  finally{ if(document.body.contains(btn)) P.busy(btn,false); }
 }
 
-function screenCorrection(){
-  const {name, idx} = current;
-  panel.innerHTML = `
-    <h2>What needs fixing?</h2>
-    <p class="sub">Listed as <strong>${esc(name)}</strong> · <span style="font-family:var(--mono)">${esc(idx)}</span>. Change what's wrong below.</p>
-    <form id="fx" class="stack" novalidate>
-      <div class="field"><label for="nName">Correct full name</label><input id="nName" value="${esc(name)}" autocomplete="name" maxlength="120"></div>
-      <div class="field"><label for="nIdx">Correct index number</label><input id="nIdx" value="${esc(idx)}" inputmode="numeric" maxlength="14"></div>
-      <div class="field"><label for="nNote">Anything else (optional)</label><textarea id="nNote" rows="2" maxlength="300" placeholder="e.g. surname should come last"></textarea></div>
-      <div id="err" class="status bad" hidden><span class="dot">!</span><span id="errT"></span></div>
-      <button class="btn primary" id="send" data-label="Submit correction" type="submit">Submit correction</button>
-      <button class="btn link" id="back" type="button">← Back to my details</button>
-    </form>`;
-  $("#back").onclick = screenDetails;
-  $("#fx").addEventListener("submit", async e=>{
-    e.preventDefault();
-    const n=$("#nName").value.trim(), i=$("#nIdx").value.replace(/\s+/g,""), note=$("#nNote").value.trim();
-    const fail=t=>{$("#errT").textContent=t; $("#err").hidden=false;};
-    if(!n) return fail("Enter your full name.");
-    if(!/^\d{8,12}$/.test(i)) return fail("Index number should be digits only (usually 10 digits).");
-    if(n===name && i===idx && !note) return fail("Nothing has changed. Edit your name or index number, or add a note.");
-    const btn=$("#send"); busy(btn,true,"Sending…");
-    try{
-      const r = await api("POST",{action:"correct", idx, newName:n, newIdx:i, note});
-      if(!r.ok) throw new Error(r.error);
-      screenDone("pend","Correction sent","The class rep will update the list. You don't need to do anything else.");
-    }catch(err){ fail(netError(err)); busy(btn,false); }
-  });
-}
-
-function screenMissing(idx){
-  panel.innerHTML = `
-    <h2>Report a missing name</h2>
-    <p class="sub">Your details will be sent to the class rep so you can be added.</p>
-    <form id="fm" class="stack" novalidate>
-      <div class="field"><label for="mName">Full name</label><input id="mName" autocomplete="name" maxlength="120"></div>
-      <div class="field"><label for="mIdx">Index number</label><input id="mIdx" inputmode="numeric" maxlength="14" value="${esc(idx||"")}"></div>
-      <div id="err" class="status bad" hidden><span class="dot">!</span><span id="errT"></span></div>
-      <button class="btn primary" id="send" data-label="Send details" type="submit">Send details</button>
-      <button class="btn link" id="back" type="button">← Back</button>
-    </form>`;
-  $("#mName").focus({preventScroll:true});
-  $("#back").onclick = ()=>screenLookup(idx);
-  $("#fm").addEventListener("submit", async e=>{
-    e.preventDefault();
-    const n=$("#mName").value.trim(), i=$("#mIdx").value.replace(/\s+/g,"");
-    const fail=t=>{$("#errT").textContent=t; $("#err").hidden=false;};
-    if(!n) return fail("Enter your full name.");
-    if(!/^\d{8,12}$/.test(i)) return fail("Index number should be digits only (usually 10 digits).");
-    const btn=$("#send"); busy(btn,true,"Sending…");
-    try{
-      const r = await api("POST",{action:"missing", idx:i, name:n});
-      if(!r.ok && r.error==="already_listed"){ busy(btn,false); return fail("That index number is already on the list. Go back and look it up instead."); }
-      if(!r.ok) throw new Error(r.error);
-      screenDone("pend","Details sent","The class rep will add you to the list.");
-    }catch(err){ fail(netError(err)); busy(btn,false); }
-  });
-}
-
-function screenDone(kind, title, text){
-  const icon = kind==="ok"
-    ? `<svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>`
-    : `<svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 12h12M12 6l6 6-6 6"/></svg>`;
-  panel.innerHTML = `
-    <div class="stack done">
-      <div class="big ${kind==="ok"?"":"pend"}">${icon}</div>
-      <h2>${esc(title)}</h2>
-      <p class="sub">${text}</p>
-      <button class="btn" id="again" type="button">Done</button>
+function viewNotFound(idx){
+  app.innerHTML = `
+    <div class="fade">
+      <h1 class="large-title">No match</h1>
+      <p class="lede"><span class="mono">${esc(idx)}</span> isn't on the class list. Check the number, or tell the class rep you're missing.</p>
+      <div class="stack">
+        <button class="btn btn-filled" id="rep" type="button">Report that I'm missing</button>
+        <button class="btn btn-gray" id="retry" type="button">Try another number</button>
+      </div>
     </div>`;
-  $("#again").onclick = ()=>{ current=null; screenLookup(); };
+  $("#retry").onclick=()=>viewLookup(idx);
+  $("#rep").onclick=()=>sheetMissing(idx);
 }
 
-screenLookup();
+/* ───────── home ───────── */
+function stats(list){
+  const c={Present:0,Absent:0,Excused:0,"Not marked":0};
+  list.forEach(s=>c[s.status]=(c[s.status]||0)+1);
+  const counted=c.Present+c.Absent;
+  return {...c, total:list.length, pct: counted? Math.round(c.Present/counted*100) : null};
+}
+function ring(pct){
+  const R=52, C=2*Math.PI*R, off = pct==null ? C : C*(1-pct/100);
+  const col = pct==null ? "var(--fill)" : tone(pct);
+  return `<div class="ring" role="img" aria-label="${pct==null?"No attendance counted yet":`Attendance ${pct} percent`}">
+    <svg viewBox="0 0 120 120" aria-hidden="true">
+      <circle cx="60" cy="60" r="${R}" fill="none" stroke="var(--fill)" stroke-width="12"/>
+      <circle class="ring-arc" cx="60" cy="60" r="${R}" fill="none" stroke="${col}" stroke-width="12" stroke-linecap="round"
+        stroke-dasharray="${C}" stroke-dashoffset="${C}" data-off="${off}"/>
+    </svg>
+    <div class="pct"><div><b>${pct==null?"–":pct+"%"}</b><span>attendance</span></div></div>
+  </div>`;
+}
+function verifyPill(s){
+  if(s.status==="Verified") return `<span class="pill ok">Details confirmed</span>`;
+  if(s.status==="Correction requested") return `<span class="pill warn">Correction requested</span>`;
+  return `<span class="pill none">Not yet confirmed</span>`;
+}
+
+const TT=window.TIMETABLE;
+function inText(m){ if(m<=0) return "on now"; const d=Math.floor(m/1440), h=Math.floor(m%1440/60), mm=m%60;
+  return "in "+(d?`${d} day${d>1?"s":""}${h?` ${h} h`:""}`:h?`${h} h${mm?` ${mm} min`:""}`:`${mm} min`); }
+function byCourse(list){
+  const g={}; list.forEach(s=>{ const k=s.course; (g[k]=g[k]||{course:k,Present:0,Absent:0,Excused:0,total:0}); g[k][s.status]=(g[k][s.status]||0)+1; g[k].total++; });
+  return Object.values(g).map(x=>({...x, pct:(x.Present+x.Absent)?Math.round(x.Present/(x.Present+x.Absent)*100):null}))
+    .sort((a,b)=>{ const A=TT.find(a.course), B=TT.find(b.course); return (A?TT.courses.indexOf(A):99)-(B?TT.courses.indexOf(B):99); });
+}
+const tone = p => p==null?"var(--label-3)":p>=75?"var(--present)":p>=50?"var(--excused)":"var(--absent)";
+function timetableHTML(){
+  const nx=TT.next(); const order=[6,0,1,2,3,4,5];
+  return `
+    <h2 class="section-h">Timetable · ${esc(TT.semester)}</h2>
+    ${order.filter(d=>TT.courses.some(c=>c.day===d)).map(d=>`
+      <div class="group" style="margin-bottom:var(--s3)">
+        <div class="row" style="font:var(--t-headline);min-height:40px">${TT.DAYS[d]}</div>
+        ${TT.courses.filter(c=>c.day===d).map(c=>`
+        <div class="row tt ${nx&&nx.course===c&&nx.live?"now":""}">
+          <span class="time">${esc(TT.time(c))}</span>
+          <div class="grow"><div>${esc(c.code)} · ${esc(c.title)}</div><div class="sub">${esc(c.lecturer)}${c.venue?` · Venue ${esc(c.venue)}`:""}</div></div>
+        </div>`).join("")}
+      </div>`).join("")}`;
+}
+function viewHome(){
+  const s=me, st=stats(s.attendance||[]);
+  const verified = s.status==="Verified";
+  app.innerHTML = `
+  <div class="fade">
+    <div class="hstack" style="justify-content:space-between;margin-top:var(--s2)">
+      <h1 class="large-title" style="margin:var(--s2) 0">My Class</h1>
+      <button class="btn btn-plain" id="switch" type="button">Not you?</button>
+    </div>
+
+    <div class="group">
+      <div class="profile">
+        <span class="avatar" aria-hidden="true">${esc(P.initials(s.name))}</span>
+        <div style="min-width:0">
+          <div class="nm">${esc(s.name)}</div>
+          <div class="ix">${esc(s.idx)}</div>
+          <div style="margin-top:8px">${verifyPill(s)}</div>
+        </div>
+      </div>
+    </div>
+
+    ${(()=>{ const nx=TT.next(); if(!nx) return ""; const c=nx.course; return `
+    <div class="group" style="margin-top:var(--s3)"><div class="next ${nx.live?"live":""}"><span class="dot" aria-hidden="true"></span>
+      <div class="grow"><div class="sub">${nx.live?"Class on now":"Next class · "+inText(nx.inMinutes)}</div>
+      <div style="font:var(--t-headline)">${esc(c.code)} · ${esc(c.title)}</div>
+      <div class="sub">${TT.DAYS[c.day]} ${esc(TT.time(c))}${c.venue?` · Venue ${esc(c.venue)}`:""}</div></div></div></div>`; })()}
+
+    ${verified?"":`
+    <p class="section-f" style="margin-top:var(--s3)">Check that your name is spelled correctly and your index number is right, then confirm.</p>`}
+
+    <div class="stack" style="margin-top:var(--s4)">
+      ${verified
+        ? `<button class="btn btn-tinted" id="confirm" type="button">Update My Email Addresses</button>`
+        : `<button class="btn btn-filled" id="confirm" type="button">Confirm My Details</button>`}
+      <button class="btn btn-gray" id="report" type="button">Report an Issue</button>
+    </div>
+
+    <h2 class="section-h">Attendance</h2>
+    <div class="group">
+      ${st.total ? `
+      <div class="ringcard">
+        ${ring(st.pct)}
+        <div class="legend">
+          <div><i style="background:var(--present)"></i>Present<b>${st.Present}</b></div>
+          <div><i style="background:var(--absent)"></i>Absent<b>${st.Absent}</b></div>
+          <div><i style="background:var(--excused)"></i>Excused<b>${st.Excused}</b></div>
+          <div class="total">${st.total} ${st.total===1?"class":"classes"} recorded${st["Not marked"]?` · ${st["Not marked"]} not marked`:""}</div>
+        </div>
+      </div>` : `<div class="empty">No classes have been recorded yet. Check back after your next class.</div>`}
+    </div>
+    ${st.total?`<p class="section-f">Excused classes don't count against you. Tap a class to report a problem with it.</p>`:""}
+
+    ${st.total?`
+    <h2 class="section-h">By Course</h2>
+    <div class="group">
+      ${byCourse(s.attendance).map(x=>`
+      <div class="row crow">
+        <div class="grow"><div>${esc(x.course)}</div>
+          <div class="sub" style="font-size:13px">${x.Present} present · ${x.Absent} absent${x.Excused?` · ${x.Excused} excused`:""}</div>
+          <div class="bar" aria-hidden="true"><i style="width:${x.pct??0}%;background:${tone(x.pct)}"></i></div></div>
+        <span class="pc" style="color:${tone(x.pct)}">${x.pct==null?"–":x.pct+"%"}</span>
+      </div>`).join("")}
+    </div>`:""}
+
+    ${st.total?`
+    <h2 class="section-h">Classes</h2>
+    <div class="group" role="list">
+      ${s.attendance.map(c=>`
+      <button class="row cls" role="listitem" type="button" data-sid="${esc(c.id)}" aria-label="${esc(P.fmtDate(c.date,true))}, ${esc(c.course)}: ${esc(c.status)}. Report a problem">
+        <div class="grow">
+          <div class="d">${esc(P.fmtDate(c.date,true))}</div>
+          <div class="sub">${esc(c.course)}${c.topic?` · ${esc(c.topic)}`:""}</div>
+        </div>
+        <span class="pill ${P.pillClass(c.status)}">${esc(c.status)}</span>
+      </button>`).join("")}
+    </div>`:""}
+
+    ${timetableHTML()}
+
+    <h2 class="section-h">My Details</h2>
+    <div class="group">
+      <div class="row"><span class="grow">Name</span><span class="val">${esc(s.name)}</span></div>
+      <div class="row"><span class="grow">Index No.</span><span class="val mono">${esc(s.idx)}</span></div>
+      <div class="row"><span class="grow">School email</span><span class="val">${esc(s.schoolEmail||"—")}</span></div>
+      <div class="row"><span class="grow">Personal email</span><span class="val">${esc(s.personalEmail||"—")}</span></div>
+    </div>
+    <p class="section-f">Something wrong here? Tap Report an Issue and choose Name spelling or Index number.</p>
+  </div>`;
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{ const a=app.querySelector(".ring-arc"); if(a) a.style.strokeDashoffset=a.dataset.off; }));
+  $("#switch").onclick=()=>{ store.set(""); viewLookup(); };
+  $("#confirm").onclick=sheetConfirm;
+  $("#report").onclick=()=>sheetReport();
+  app.querySelectorAll("[data-sid]").forEach(b=>b.onclick=()=>sheetReport("attendance", b.dataset.sid));
+}
+
+/* ───────── confirm details ───────── */
+function emailFields(school="", personal=""){
+  return `
+  <div class="field"><label for="eSchool">School email (leave blank if you don't have one yet)</label>
+    <input id="eSchool" class="input" type="email" inputmode="email" autocomplete="off" maxlength="120" placeholder="you@gctu.edu.gh" value="${esc(school)}"></div>
+  <div class="field"><label for="ePersonal">Personal email</label>
+    <input id="ePersonal" class="input" type="email" inputmode="email" autocomplete="email" maxlength="120" placeholder="you@gmail.com" value="${esc(personal)}"></div>`;
+}
+function readEmails(){
+  const school=$("#eSchool").value.trim().toLowerCase(), personal=$("#ePersonal").value.trim().toLowerCase();
+  if(!personal) return {error:"Enter your personal email address."};
+  if(!P.EMAIL_RE.test(personal)) return {error:"Your personal email doesn't look right."};
+  if(school && !P.EMAIL_RE.test(school)) return {error:"Your school email doesn't look right. Check it, or leave it blank."};
+  return {schoolEmail:school, personalEmail:personal};
+}
+function sheetConfirm(){
+  const s=me, again = s.status==="Verified";
+  P.openSheet({
+    title: again ? "Email Addresses" : "Confirm Details",
+    left:`<button class="btn btn-plain" data-close type="button">Cancel</button>`,
+    body:`
+      <div class="group">
+        <div class="row"><span class="grow">Name</span><span class="val">${esc(s.name)}</span></div>
+        <div class="row"><span class="grow">Index No.</span><span class="val mono">${esc(s.idx)}</span></div>
+      </div>
+      ${again?"":`<p class="hint" style="margin:-8px 0 0">Confirming means your name is spelled correctly and your index number is right.</p>`}
+      <form id="fc" class="stack" novalidate>
+        ${emailFields(s.schoolEmail, s.personalEmail)}
+        <div id="serr" class="banner err" hidden role="alert"><span class="ic">!</span><span id="serrT"></span></div>
+        <button class="btn btn-filled" id="send" type="submit">${again?"Save":"Confirm"}</button>
+      </form>`,
+    onMount(){
+      $("#fc").addEventListener("submit", async e=>{
+        e.preventDefault();
+        const fail=t=>{ $("#serrT").textContent=t; $("#serr").hidden=false; };
+        const em=readEmails(); if(em.error) return fail(em.error);
+        const btn=$("#send"); P.busy(btn,true,"Saving");
+        try{
+          const r=await P.call("POST",{action:"confirm", idx:s.idx, ...em});
+          if(!r.ok) throw new Error(r.error);
+          Object.assign(me,{status:"Verified", verifiedOn:r.verifiedOn, schoolEmail:em.schoolEmail, personalEmail:em.personalEmail});
+          P.closeSheet(); viewHome(); P.toast(again?"Saved":"Details confirmed");
+        }catch(err){ fail(P.errText(err)); P.busy(btn,false); }
+      });
+    }
+  });
+}
+
+/* ───────── report an issue ───────── */
+const CATS=[
+  {k:"name", t:"Name spelling", d:"My name is spelled wrongly"},
+  {k:"index", t:"Index number", d:"My index number is wrong"},
+  {k:"attendance", t:"Attendance record", d:"A class is marked wrongly"},
+  {k:"other", t:"Something else", d:"Any other issue"}
+];
+function sheetReport(cat="name", sid=""){
+  const s=me, classes=(s.attendance||[]);
+  P.openSheet({
+    title:"Report an Issue",
+    left:`<button class="btn btn-plain" data-close type="button">Cancel</button>`,
+    body:`
+      <div>
+        <div class="section-h" style="margin-top:0">What's the issue?</div>
+        <div class="group" role="radiogroup" aria-label="Issue type">
+          ${CATS.map(c=>`<button type="button" class="row choice" role="radio" aria-checked="${c.k===cat}" data-k="${c.k}">
+            <span class="grow">${c.t}<span class="sub" style="display:block">${c.d}</span></span><span class="tick" aria-hidden="true">✓</span></button>`).join("")}
+        </div>
+      </div>
+      <form id="fr" class="stack" novalidate>
+        <div class="field" data-for="name"><label for="rName">Correct spelling of your full name</label>
+          <input id="rName" class="input" autocomplete="name" maxlength="120" value="${esc(s.name)}"></div>
+        <div class="field" data-for="index"><label for="rIdx">Your correct index number</label>
+          <input id="rIdx" class="input mono" inputmode="numeric" maxlength="14" value="${esc(s.idx)}"></div>
+        <div class="field" data-for="attendance"><label for="rSession">Which class?</label>
+          <select id="rSession" class="input">
+            ${classes.length?classes.map(c=>`<option value="${esc(c.id)}" ${c.id===sid?"selected":""}>${esc(P.fmtDate(c.date))} · ${esc(c.course)} (${esc(c.status)})</option>`).join(""):`<option value="">No classes recorded yet</option>`}
+          </select></div>
+        <div class="field"><label for="rMsg" id="rMsgL">Details</label>
+          <textarea id="rMsg" class="input" maxlength="600" placeholder="Tell the class rep what's wrong"></textarea></div>
+        <div class="field"><label for="rMail">Your email, so the class rep can reply</label>
+          <input id="rMail" class="input" type="email" inputmode="email" autocomplete="email" maxlength="120" value="${esc(s.personalEmail||"")}" placeholder="you@gmail.com"></div>
+        <div id="serr" class="banner err" hidden role="alert"><span class="ic">!</span><span id="serrT"></span></div>
+        <button class="btn btn-filled" id="send" type="submit">Send to Class Rep</button>
+      </form>`,
+    onMount(sc){
+      let current=cat;
+      const sync=()=>{
+        sc.querySelectorAll(".choice").forEach(b=>b.setAttribute("aria-checked", String(b.dataset.k===current)));
+        sc.querySelectorAll("[data-for]").forEach(f=>f.hidden = f.dataset.for!==current);
+        $("#rMsgL").textContent = (current==="name"||current==="index") ? "Anything else (optional)" : "Details";
+        $("#rMsg").placeholder = current==="attendance" ? "e.g. I was in class but marked absent" : "Tell the class rep what's wrong";
+        $("#serr").hidden=true;
+      };
+      sc.querySelectorAll(".choice").forEach(b=>b.onclick=()=>{ current=b.dataset.k; sync(); });
+      sync();
+      $("#fr").addEventListener("submit", async e=>{
+        e.preventDefault();
+        const fail=t=>{ $("#serrT").textContent=t; $("#serr").hidden=false; };
+        const msg=$("#rMsg").value.trim(), mail=$("#rMail").value.trim().toLowerCase();
+        const payload={action:"feedback", idx:s.idx, category:current, message:msg, contactEmail:mail};
+        if(mail && !P.EMAIL_RE.test(mail)) return fail("Your email doesn't look right.");
+        if(current==="name"){ const n=$("#rName").value.trim(); if(!n) return fail("Enter your full name."); if(n===s.name) return fail("That's the same as the name on the list. Change it to the correct spelling."); payload.newName=n; }
+        if(current==="index"){ const i=$("#rIdx").value.replace(/\s+/g,""); if(!/^\d{8,12}$/.test(i)) return fail("Index number should be digits only (usually 10 digits)."); if(i===s.idx) return fail("That's the same index number. Enter the correct one."); payload.newIdx=i; }
+        if(current==="attendance"){ if(!classes.length) return fail("No classes have been recorded yet."); payload.sessionId=$("#rSession").value; }
+        if((current==="attendance"||current==="other") && !msg) return fail("Tell the class rep what the issue is.");
+        const btn=$("#send"); P.busy(btn,true,"Sending");
+        try{
+          const r=await P.call("POST",payload);
+          if(!r.ok) throw new Error(r.error);
+          if(current==="name"||current==="index") me.status="Correction requested";
+          P.closeSheet(); viewHome(); P.toast("Sent to the class rep");
+        }catch(err){ fail(P.errText(err)); P.busy(btn,false); }
+      });
+    }
+  });
+}
+
+/* ───────── missing from list ───────── */
+function sheetMissing(idx=""){
+  P.openSheet({
+    title:"Not on the List",
+    left:`<button class="btn btn-plain" data-close type="button">Cancel</button>`,
+    body:`
+      <p class="hint" style="margin:0">If you're in this class but can't find yourself, send your details and the class rep will add you.</p>
+      <form id="fm" class="stack" novalidate>
+        <div class="field"><label for="mName">Full name</label><input id="mName" class="input" autocomplete="name" maxlength="120"></div>
+        <div class="field"><label for="mIdx">Index number</label><input id="mIdx" class="input mono" inputmode="numeric" maxlength="14" value="${esc(idx)}"></div>
+        ${emailFields()}
+        <div id="serr" class="banner err" hidden role="alert"><span class="ic">!</span><span id="serrT"></span></div>
+        <button class="btn btn-filled" id="send" type="submit">Send to Class Rep</button>
+      </form>`,
+    onMount(){
+      $("#fm").addEventListener("submit", async e=>{
+        e.preventDefault();
+        const fail=t=>{ $("#serrT").textContent=t; $("#serr").hidden=false; };
+        const n=$("#mName").value.trim(), i=$("#mIdx").value.replace(/\s+/g,"");
+        if(!n) return fail("Enter your full name.");
+        if(!/^\d{8,12}$/.test(i)) return fail("Index number should be digits only (usually 10 digits).");
+        const em=readEmails(); if(em.error) return fail(em.error);
+        const btn=$("#send"); P.busy(btn,true,"Sending");
+        try{
+          const r=await P.call("POST",{action:"missing", idx:i, name:n, ...em});
+          if(!r.ok) throw new Error(r.error);
+          P.closeSheet(); P.toast("Sent to the class rep");
+        }catch(err){ fail(P.errText(err)); P.busy(btn,false); }
+      });
+    }
+  });
+}
+
+/* ───────── start ───────── */
+P.mountLogo();
+const saved=store.get();
+if(saved){ viewLookup(saved); lookup(saved, $("#go")); } else viewLookup();
 </script>
 </body>
 </html>

@@ -1,33 +1,38 @@
-# MSc/MPhil IT Class Roster
+# GCTU · MPhil/MSc Information Technology · January 2026 Cohort — Class Portal
 
-Class roster verification portal for the MSc/MPhil Information Technology cohort. Students enter their index number to check their name and details, then confirm them or request a correction. Every response updates the master list.
-
-| Page | Who uses it | What it does |
+| Page | Who | What it does |
 |---|---|---|
-| `index.html` | Students | Look up by index number, confirm details, request a correction, or report a missing name |
-| `admin.html` | Class rep | Password-protected master list: verified / not verified counts, search, download as Excel or CSV |
+| `index.html` | Students | Enter index number → next class, attendance ring, attendance per course, every class, timetable; confirm name & index, add emails, report an issue |
+| `admin.html` | Class rep | Take the register (Present / Absent / Excused), edit or delete past classes, see students & emails, read feedback, download Excel |
 
-No student names are stored in this repository. The roster and all responses live in a private Google Sheet that only the Apps Script back end can read.
-
-## How it fits together
+Every issue a student reports is **emailed to the class rep** and listed on the Feedback tab.
+No student data lives in this repository — it is all in a private Google Sheet reached through Apps Script.
 
 ```
-Student ─▶ index.html (GitHub Pages) ─▶ Apps Script web app ─▶ Google Sheet (private)
-Class rep ─▶ admin.html (GitHub Pages) ─▶ Apps Script (needs ADMIN_KEY) ─▶ same sheet
+Students  ─▶ index.html ─┐
+                          ├─▶ Apps Script web app ─▶ Google Sheet (private) ─▶ email to class rep
+Class rep ─▶ admin.html ─┘        (admin needs ADMIN_KEY)
 ```
 
-## Setup
+## Files
+```
+index.html            student portal
+admin.html            class rep (register, students, feedback)
+config.js             ← paste the Apps Script web app URL here
+assets/app.css        design tokens + components
+assets/common.js      shared helpers
+assets/timetable.js   2nd-semester timetable (courses, lecturers, times, venues) — edit if it changes
+assets/gctu-logo.png  ← add the GCTU logo (see assets/LOGO-README.txt)
+backend/Code.gs       paste into the Google Sheet's Apps Script
+```
 
-1. **Google Sheet** – open your copy of *MSc IT Class Roster – Master List* (tabs: Master List, Summary, Log).
-2. **Back end** – in the sheet go to *Extensions → Apps Script*, paste `backend/Code.gs`, and save.
-3. **Admin password** – in Apps Script open *Project Settings* (gear) → *Script properties* → add `ADMIN_KEY` with a long password. Do **not** put the password in any file in this repo.
-4. **Deploy** – *Deploy → New deployment → Web app*, Execute as **Me**, Who has access **Anyone**. Authorise, then copy the web app URL.
-5. **Connect** – edit `config.js` in this repo and paste the URL between the quotes. Commit.
-6. **GitHub Pages** – *Settings → Pages → Deploy from a branch → main / (root)*.
+## Setup (one time)
+1. Google Sheet → **Extensions → Apps Script** → paste `backend/Code.gs` → Save.
+2. **Project Settings → Script properties**: `ADMIN_KEY` = your admin password. Optional: `NOTIFY_EMAIL` = where feedback goes (defaults to your Google account).
+3. In the editor choose the **setup** function → **Run** → allow permissions (Sheets + send email). This creates the Sessions, Attendance, Register and Feedback tabs.
+4. **Deploy → New deployment → Web app** · Execute as **Me** · Access **Anyone** → copy the URL.
+5. Paste the URL into `config.js`. Add `assets/gctu-logo.png`.
+6. Upload everything to the GitHub repo → **Settings → Pages → main / root**.
 
-Student link: `https://<username>.github.io/<repo>/`
-Master list: `https://<username>.github.io/<repo>/admin.html`
-
-## Updating the back end
-
-If you change `Code.gs`, redeploy with *Deploy → Manage deployments → Edit (pencil) → Version: New version → Deploy*. This keeps the same URL, so `config.js` does not change.
+## Updating the back end later
+Deploy → Manage deployments → ✏️ → Version: **New version** → Deploy (URL stays the same). Never upload over `config.js`.
