@@ -78,7 +78,7 @@
   <header class="brand topbar">
     <div class="hstack" style="gap:var(--s3);flex-wrap:nowrap">
       <img class="logo" src="assets/gctu-logo.png" alt="GCTU logo" width="44" height="44">
-      <div><div class="org">Class Rep</div><div class="prog">MPhil/MSc. Information Technology · January 2026 Cohort</div></div>
+      <div><div class="org" id="who">Class Rep</div><div class="prog">MPhil/MSc. Information Technology · January 2026 Cohort</div></div>
     </div>
     <div class="hstack" id="topActions" hidden>
       <nav class="tabs" id="tabs" aria-label="Sections"></nav>
@@ -95,7 +95,8 @@
 <script>
 const P=window.Portal, {$, esc}=P;
 const app=$("#app");
-let KEY=""; try{ KEY=sessionStorage.getItem("gctu-admin")||""; }catch(e){}
+let KEY="", EMAIL=""; try{ KEY=sessionStorage.getItem("gctu-admin")||""; EMAIL=localStorage.getItem("gctu-admin-email")||""; }catch(e){}
+const who=e=>(e||"").split("@")[0];  // no admin emails are stored in this public file
 let D=null;           // admin data
 let tab="register";
 const STATUSES=["Present","Absent","Excused"];
@@ -114,31 +115,34 @@ function viewLogin(err=""){
     <h1 class="large-title">Sign In</h1>
     <p class="lede">Take the class register, review students and read feedback.</p>
     <form id="lf" class="stack" novalidate>
-      <div class="field"><label for="key">Admin password</label>
+      <div class="field"><label for="email">Admin email</label>
+        <input id="email" class="input" type="email" inputmode="email" autocomplete="username" value="${esc(EMAIL)}" placeholder="you@gmail.com"></div>
+      <div class="field"><label for="key">Password</label>
         <input id="key" class="input" type="password" autocomplete="current-password"></div>
       <div id="err" class="banner err" ${err?"":"hidden"} role="alert"><span class="ic">!</span><span id="errT">${esc(err)}</span></div>
       <button class="btn btn-filled" id="go" type="submit">Sign In</button>
     </form>
   </div>`;
-  $("#key").focus();
+  (EMAIL?$("#key"):$("#email")).focus();
   $("#lf").addEventListener("submit", async e=>{
     e.preventDefault();
-    const k=$("#key").value; if(!k){ $("#errT").textContent="Enter the admin password."; $("#err").hidden=false; return; }
+    const em=$("#email").value.trim().toLowerCase(), k=$("#key").value;
+    if(!em||!k){ $("#errT").textContent="Enter your admin email and password."; $("#err").hidden=false; return; }
     const b=$("#go"); P.busy(b,true,"Signing in");
     try{
-      const r=await P.call("POST",{action:"admin", key:k});
+      const r=await P.call("POST",{action:"admin", email:em, key:k});
       if(!r.ok) throw new Error(r.error);
-      KEY=k; try{ sessionStorage.setItem("gctu-admin",k); }catch(e){}
+      KEY=k; EMAIL=em; try{ sessionStorage.setItem("gctu-admin",k); localStorage.setItem("gctu-admin-email",em); }catch(e){}
       D=r; startApp();
     }catch(ex){ $("#errT").textContent=P.errText(ex); $("#err").hidden=false; P.busy(b,false); }
   });
 }
-function lock(){ KEY=""; D=null; try{ sessionStorage.removeItem("gctu-admin"); }catch(e){} viewLogin(); }
-async function api(payload){ const r=await P.call("POST",{...payload, key:KEY}); if(!r.ok){ if(r.error==="wrong_key") lock(); throw new Error(r.error); } return r; }
+function lock(){ KEY=""; $("#who").textContent="Class Rep"; D=null; try{ sessionStorage.removeItem("gctu-admin"); }catch(e){} viewLogin(); }
+async function api(payload){ const r=await P.call("POST",{...payload, email:EMAIL, key:KEY}); if(!r.ok){ if(r.error==="wrong_key") lock(); throw new Error(r.error); } return r; }
 async function reload(){ D=await api({action:"admin"}); renderTabs(); }
 
 /* ───────── shell ───────── */
-function startApp(){ $("#topActions").hidden=false; $("#lock").onclick=lock; renderTabs(); show(tab); }
+function startApp(){ $("#topActions").hidden=false; $("#who").textContent=`Class Rep · ${who(D.me||EMAIL)}`; $("#lock").onclick=lock; renderTabs(); show(tab); }
 function renderTabs(){
   const open=(D.feedback||[]).filter(f=>f.status!=="Resolved").length;
   const items=[["register","Register"],["students","Students"],["feedback","Feedback"]];
@@ -191,6 +195,7 @@ function viewRegister(){
           <div class="sub">${esc(s.course)}${s.topic?` · ${esc(s.topic)}`:""}</div>
           ${courseMeta(s.course)?`<div class="sub" style="font-size:13px">${esc(courseMeta(s.course))}</div>`:""}
         </div>
+        ${s.by?`<span class="sub" style="font-size:12px;white-space:nowrap">by ${esc(who(s.by))}</span>`:""}
         <div class="counts" aria-label="${s.counts.Present} present, ${s.counts.Absent} absent, ${s.counts.Excused} excused">
           <span class="mini p">${s.counts.Present} P</span><span class="mini a">${s.counts.Absent} A</span><span class="mini e">${s.counts.Excused} E</span>
         </div>
@@ -376,7 +381,7 @@ function viewFeedback(){
         <div class="top"><span class="cat">${esc(f.category)}</span><strong>${esc(f.name)}</strong><span class="mono" style="color:var(--label-3);font-size:13px">${esc(f.idx)}</span>
           <span style="margin-left:auto" class="pill ${f.status==="Resolved"?"ok":"warn"}">${esc(f.status)}</span></div>
         <div class="msg">${esc(f.details||"(no details)")}</div>
-        <div class="meta">${esc(f.date)}${f.session?` · Class: ${esc(f.session)}`:""}${f.contact?` · <a href="mailto:${esc(f.contact)}">${esc(f.contact)}</a>`:""}</div>
+        <div class="meta">${esc(f.date)}${f.session?` · Class: ${esc(f.session)}`:""}${f.contact?` · <a href="mailto:${esc(f.contact)}">${esc(f.contact)}</a>`:""}${f.status==="Resolved"&&f.by?` · Resolved by ${esc(who(f.by))}`:""}</div>
         <div style="margin-top:8px"><button class="btn btn-sm ${f.status==="Resolved"?"btn-gray":"btn-tinted"}" type="button" data-row="${f.row}" data-to="${f.status==="Resolved"?"Open":"Resolved"}">${f.status==="Resolved"?"Reopen":"Mark Resolved"}</button></div>
       </div>`).join("")}</div>`
     :`<div class="group"><div class="row" style="justify-content:center;color:var(--label-3);padding:28px">${fFilter==="Open"?"No open feedback. You're all caught up.":"Nothing here yet."}</div></div>`}
@@ -409,9 +414,9 @@ async function exportExcel(){
       bc.push([r.name,r.idx,...cells,(tp+ta)?Math.round(tp/(tp+ta)*100):""]); });
     const ws2=XLSX.utils.aoa_to_sheet(bc); ws2["!cols"]=[{wch:32},{wch:13},...courses.map(()=>({wch:12})),{wch:10}];
     XLSX.utils.book_append_sheet(wb,ws2,"By Course");
-    XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(S.map(s=>({Date:s.date,Course:s.course,Lecturer:(window.TIMETABLE.find(s.course)||{}).lecturer||"",Topic:s.topic,Present:s.counts.Present,Absent:s.counts.Absent,Excused:s.counts.Excused}))),"Classes");
+    XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(S.map(s=>({Date:s.date,Course:s.course,Lecturer:(window.TIMETABLE.find(s.course)||{}).lecturer||"",Topic:s.topic,Present:s.counts.Present,Absent:s.counts.Absent,Excused:s.counts.Excused,"Taken By":s.by||""}))),"Classes");
     XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(R.map(r=>({Name:r.name,"Index No.":r.idx,Details:r.status,"Confirmed On":r.date,"Correct Name":r.newName,"Correct Index No.":r.newIdx,Note:r.note,"School Email":r.schoolEmail,"Personal Email":r.personalEmail,Present:r.present,Absent:r.absent,Excused:r.excused,"Attendance %":pct(r)==null?"":pct(r)+"%"}))),"Students");
-    XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet((D.feedback||[]).map(f=>({Date:f.date,"Index No.":f.idx,Name:f.name,Category:f.category,Details:f.details,Class:f.session,Contact:f.contact,Status:f.status}))),"Feedback");
+    XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet((D.feedback||[]).map(f=>({Date:f.date,"Index No.":f.idx,Name:f.name,Category:f.category,Details:f.details,Class:f.session,Contact:f.contact,Status:f.status,"Handled By":f.by||""}))),"Feedback");
     XLSX.writeFile(wb,`GCTU-MSc-IT-Jan2026-register-${P.today()}.xlsx`);
   }catch(e){ P.toast(P.errText(e)); }
   finally{ P.busy(btn,false); }
