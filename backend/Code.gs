@@ -5,14 +5,34 @@
  * SETUP
  *  1. In the Google Sheet: Extensions → Apps Script → paste this file → Save.
  *  2. Project Settings (gear) → Script properties:
- *       ADMIN_KEY     = a long password only you know   (required)
- *       NOTIFY_EMAIL  = where feedback emails go         (optional – defaults to your Google account)
+ *       One property per admin – the property NAME is the admin's email, the VALUE is their password:
+ *         first.admin@gmail.com   = <first admin's password>
+ *         second.admin@gmail.com  = <second admin's password>
+ *       Feedback emails go to every admin listed (or set NOTIFY_EMAIL to override).
  *  3. Deploy → New deployment → Web app → Execute as: Me · Who has access: Anyone.
  *  Never write passwords in this file – it is public on GitHub.
  *
  * Sheet tabs (created automatically if missing):
  *  Master List · Log · Sessions · Attendance · Register · Feedback
  */
+/* ═══════════ RUN THIS FIRST: choose "setup" in the function dropdown above and click Run ═══════════ */
+function setup() {
+  const book = SpreadsheetApp.getActiveSpreadsheet();
+  if (!book) throw new Error('This script is not attached to a Google Sheet. Open the class sheet, then Extensions → Apps Script, and paste the code there.');
+  if (!book.getSheetByName('Master List')) throw new Error('No "Master List" tab found. Rename the tab with the student names to exactly: Master List');
+  Object.keys(HEAD).forEach(n => tab_(n));
+  rebuildRegister_();
+  MailApp.getRemainingDailyQuota(); // asks for permission to send feedback emails
+  const made = Object.keys(HEAD).concat([T.REGISTER]).filter(n => book.getSheetByName(n));
+  Logger.log('Setup complete. Tabs ready: ' + made.join(', '));
+  try { SpreadsheetApp.getUi().alert('Class Portal setup complete.\n\nTabs ready: ' + made.join(', ')); } catch (e) {}
+}
+
+/* Adds a "Class Portal" menu to the sheet so setup can also be run from there */
+function onOpen() {
+  SpreadsheetApp.getUi().createMenu('Class Portal').addItem('Set up / repair tabs', 'setup').addToUi();
+}
+
 const TZ = 'Africa/Accra';
 const STATUSES = ['Present', 'Absent', 'Excused'];
 const T = {
@@ -22,9 +42,9 @@ const T = {
 const HEAD = {
   'Master List': ['No.', 'Name', 'Index No.', 'Status', 'Verified On', 'Correct Name', 'Correct Index No.', 'Note', 'School Email', 'Personal Email'],
   'Log': ['Timestamp', 'Action', 'Index No.', 'Name', 'Details'],
-  'Sessions': ['Session ID', 'Date', 'Course', 'Topic', 'Created', 'Updated'],
+  'Sessions': ['Session ID', 'Date', 'Course', 'Topic', 'Created', 'Updated', 'Updated By'],
   'Attendance': ['Session ID', 'Index No.', 'Status'],
-  'Feedback': ['Timestamp', 'Index No.', 'Name', 'Category', 'Details', 'Session', 'Contact Email', 'Status']
+  'Feedback': ['Timestamp', 'Index No.', 'Name', 'Category', 'Details', 'Session', 'Contact Email', 'Status', 'Handled By']
 };
 const COL = { status: 4, date: 5, newName: 6, newIdx: 7, note: 8, school: 9, personal: 10 };
 const CATEGORIES = { name: 'Name spelling', index: 'Index number', attendance: 'Attendance record', other: 'Other' };
@@ -47,25 +67,20 @@ function doPost(e) {
   finally { lock.releaseLock(); }
 }
 
-/** Optional: run once from the editor to create all tabs and authorise email. */
-function setup() {
-  Object.keys(HEAD).forEach(n => tab_(n));
-  rebuildRegister_();
-  MailApp.getRemainingDailyQuota();
-}
 
 function route_(d) {
   const a = String(d.action || '');
   const admin = {
-    admin: () => adminData_(),
+    admin: who => Object.assign(adminData_(), { me: who }),
     getSession: () => getSession_(d.id),
-    saveSession: () => saveSession_(d),
-    deleteSession: () => deleteSession_(d.id),
-    setFeedback: () => setFeedback_(d.row, d.status)
+    saveSession: who => saveSession_(d, who),
+    deleteSession: who => deleteSession_(d.id, who),
+    setFeedback: who => setFeedback_(d.row, d.status, who)
   };
   if (admin[a]) {
-    const bad = checkKey_(d.key);
-    return bad || admin[a]();
+    const who = adminEmail_(d.email, d.key);
+    if (who.error) return { ok: false, error: who.error };
+    return admin[a](who.email);
   }
   if (a === 'confirm') return confirm_(d);
   if (a === 'feedback') return feedback_(d);
@@ -192,11 +207,18 @@ function missing_(d) {
 }
 
 /* ───────────────────────── admin side ───────────────────────── */
-function checkKey_(key) {
-  const real = PropertiesService.getScriptProperties().getProperty('ADMIN_KEY');
-  if (!real) return { ok: false, error: 'admin_key_not_set' };
-  if (String(key || '') !== real) { Utilities.sleep(800); return { ok: false, error: 'wrong_key' }; }
-  return null;
+/* Admins = script properties whose name is an email address; value = that admin's password */
+function admins_() {
+  const p = PropertiesService.getScriptProperties().getProperties();
+  return Object.keys(p).filter(k => k.indexOf('@') > 0).map(k => ({ email: k.trim().toLowerCase(), pass: p[k] }));
+}
+function adminEmail_(email, key) {
+  const list = admins_();
+  if (!list.length) return { error: 'admin_key_not_set' };
+  email = String(email || '').trim().toLowerCase();
+  const a = list.filter(x => x.email === email)[0];
+  if (!a || String(key || '') !== String(a.pass)) { Utilities.sleep(800); return { error: 'wrong_key' }; }
+  return { email: a.email };
 }
 
 function adminData_() {
@@ -222,8 +244,8 @@ function adminData_() {
   });
   const fb = tab_(T.FEEDBACK);
   const fl = fb.getLastRow();
-  const feedback = fl < 2 ? [] : fb.getRange(2, 1, fl - 1, 8).getDisplayValues().map((r, i) => ({
-    row: i + 2, date: r[0], idx: r[1], name: r[2], category: r[3], details: r[4], session: r[5], contact: r[6], status: r[7] || 'Open'
+  const feedback = fl < 2 ? [] : fb.getRange(2, 1, fl - 1, 9).getDisplayValues().map((r, i) => ({
+    row: i + 2, date: r[0], idx: r[1], name: r[2], category: r[3], details: r[4], session: r[5], contact: r[6], status: r[7] || 'Open', by: r[8]
   })).reverse();
   return {
     ok: true, updated: now_(), rows: rows,
@@ -241,7 +263,7 @@ function getSession_(id) {
   return { ok: true, session: s, marks: marks };
 }
 
-function saveSession_(d) {
+function saveSession_(d, who) {
   const date = String(d.date || '');
   if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) return { ok: false, error: 'invalid_date' };
   const course = safe_(d.course, 80);
@@ -265,17 +287,17 @@ function saveSession_(d) {
   const row = existing > 0 ? existing : ss.getLastRow() + 1;
   ss.getRange(row, 1, 1, 2).setNumberFormat('@');
   const created = existing > 0 ? ss.getRange(row, 5).getDisplayValue() : now;
-  ss.getRange(row, 1, 1, 6).setValues([[id, date, course, topic, created, now]]);
+  ss.getRange(row, 1, 1, 7).setValues([[id, date, course, topic, created, now, who || '']]);
 
   const keep = readAttendance_().filter(m => m.id !== id);
   Object.keys(valid).forEach(i => keep.push({ id: id, idx: i, status: valid[i] }));
   writeAttendance_(keep);
   rebuildRegister_();
-  log_(now, existing > 0 ? 'Register updated' : 'Register taken', '', course, date + ' · ' + Object.keys(valid).length + ' students');
+  log_(now, existing > 0 ? 'Register updated' : 'Register taken', '', course, date + ' · ' + Object.keys(valid).length + ' students · by ' + (who || '?'));
   return { ok: true, id: id };
 }
 
-function deleteSession_(id) {
+function deleteSession_(id, who) {
   id = String(id || '');
   const ss = tab_(T.SESSIONS);
   const r = findRowBy_(ss, 1, id);
@@ -284,16 +306,16 @@ function deleteSession_(id) {
   ss.deleteRow(r);
   writeAttendance_(readAttendance_().filter(m => m.id !== id));
   rebuildRegister_();
-  log_(now_(), 'Register deleted', '', info[1], info[0]);
+  log_(now_(), 'Register deleted', '', info[1], info[0] + ' · by ' + (who || '?'));
   return { ok: true };
 }
 
-function setFeedback_(row, status) {
+function setFeedback_(row, status, who) {
   const fb = tab_(T.FEEDBACK);
   row = Number(row);
   if (!(row >= 2 && row <= fb.getLastRow())) return { ok: false, error: 'not_found' };
   if (['Open', 'Resolved'].indexOf(status) < 0) return { ok: false, error: 'invalid_status' };
-  fb.getRange(row, 8).setValue(status);
+  fb.getRange(row, 8, 1, 2).setValues([[status, status === 'Resolved' ? (who || '') : '']]);
   return { ok: true };
 }
 
@@ -331,8 +353,8 @@ function readSessions_() {
   const ss = tab_(T.SESSIONS);
   const l = ss.getLastRow();
   if (l < 2) return [];
-  return ss.getRange(2, 1, l - 1, 4).getDisplayValues().filter(r => r[0])
-    .map(r => ({ id: r[0], date: r[1], course: r[2], topic: r[3] }))
+  return ss.getRange(2, 1, l - 1, 7).getDisplayValues().filter(r => r[0])
+    .map(r => ({ id: r[0], date: r[1], course: r[2], topic: r[3], updated: r[5], by: r[6] }))
     .sort((a, b) => a.date < b.date ? 1 : a.date > b.date ? -1 : (a.id < b.id ? 1 : -1));
 }
 function readAttendance_() {
@@ -368,6 +390,9 @@ function tab_(name) {
       sh.setFrozenRows(1);
     }
   }
+  if (HEAD[name] && sh.getLastRow() >= 1 && sh.getRange(1, HEAD[name].length).getDisplayValue() === '') {
+    sh.getRange(1, 1, 1, HEAD[name].length).setValues([HEAD[name]]).setFontWeight('bold');
+  }
   if (name === T.MASTER && sh.getRange(1, COL.school).getDisplayValue() !== 'School Email') {
     sh.getRange(1, COL.school, 1, 2).setValues([['School Email', 'Personal Email']]).setFontWeight('bold');
   }
@@ -389,7 +414,8 @@ function log_(ts, action, idx, name, details) {
 }
 function notify_(subject, body, replyTo) {
   try {
-    const to = PropertiesService.getScriptProperties().getProperty('NOTIFY_EMAIL') || Session.getEffectiveUser().getEmail();
+    const to = PropertiesService.getScriptProperties().getProperty('NOTIFY_EMAIL') ||
+      admins_().map(a => a.email).join(',') || Session.getEffectiveUser().getEmail();
     if (!to) return;
     const opts = { to: to, subject: subject, body: body, name: 'GCTU MSc IT Class Portal' };
     if (replyTo) opts.replyTo = replyTo;
