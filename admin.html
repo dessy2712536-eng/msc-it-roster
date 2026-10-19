@@ -91,6 +91,9 @@
 <script src="config.js"></script>
 <script src="assets/common.js"></script>
 <script src="assets/timetable.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jspdf-autotable@3.8.2/dist/jspdf.plugin.autotable.min.js"></script>
+<script src="assets/pdf.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script>
 const P=window.Portal, {$, esc}=P;
@@ -174,6 +177,7 @@ function viewRegister(){
     <div class="titlebar">
       <h1 class="large-title">Register</h1>
       <div class="hstack">
+        <button class="btn btn-tinted btn-sm" id="pdf" type="button">Download PDF</button>
         <button class="btn btn-tinted btn-sm" id="xls" type="button">Download Excel</button>
         <button class="btn btn-filled btn-sm" id="new" type="button">＋ New Class</button>
       </div>
@@ -204,10 +208,19 @@ function viewRegister(){
     :`<div class="group"><div class="row" style="justify-content:center;color:var(--label-3);padding:28px">${rCourse?"No classes recorded for this course yet.":"No classes yet. Tap New Class to take your first register."}</div></div>`}
   </div>`;
   $("#rc").onchange=e=>{ rCourse=e.target.value; viewRegister(); };
+  $("#pdf").onclick=async ()=>{
+    if(!window.RegisterPDF||!RegisterPDF.ready()) return P.toast("PDF tools couldn't load. Check your connection and refresh.");
+    if(!S.length) return P.toast("No classes to include yet.");
+    const b=$("#pdf"); P.busy(b,true,"Preparing");
+    try{ await RegisterPDF.fullRegister({sessions:S, rows:sortedRows(), matrix:D.matrix||{}, course:rCourse, me:who(D.me||EMAIL)}); }
+    catch(e){ P.toast("Couldn't create the PDF."); }
+    finally{ P.busy(b,false); }
+  };
   $("#new").onclick=()=>viewEditor(null);
   $("#xls").onclick=exportExcel;
   app.querySelectorAll("[data-id]").forEach(b=>b.onclick=()=>openSession(b.dataset.id));
 }
+function sortedRows(){ return (D.rows||[]).slice().sort((a,b)=>a.name.localeCompare(b.name,"en",{sensitivity:"base"})); }
 function openSession(id){
   const s=(D.sessions||[]).find(x=>x.id===id); if(!s) return P.toast(P.MSG.not_found);
   viewEditor(s, (D.matrix||{})[id]||{});
@@ -246,6 +259,7 @@ function viewEditor(session, marks={}){
 
     <div class="savebar">
       <div class="sum" id="sum" aria-live="polite"></div>
+      <button class="btn btn-tinted" id="cpdf" type="button">Download PDF</button>
       <button class="btn btn-filled" id="save" type="button">Save Register</button>
     </div>
     <div id="eerr" class="banner err" hidden role="alert" style="margin-top:var(--s3)"><span class="ic">!</span><span id="eerrT"></span></div>
@@ -309,6 +323,15 @@ function viewEditor(session, marks={}){
     const b=$("#del"); P.busy(b,true,"Deleting");
     try{ await api({action:"deleteSession", id:session.id}); await reload(); show("register"); P.toast("Class deleted"); }
     catch(e){ fail(P.errText(e)); P.busy(b,false); }
+  };
+  $("#cpdf").onclick=async ()=>{
+    if(!window.RegisterPDF||!RegisterPDF.ready()) return P.toast("PDF tools couldn't load. Check your connection and refresh.");
+    const course=(sel.value==="__other"?$("#eOther").value:sel.value).trim();
+    if(!$("#eDate").value||!course) return fail("Pick the date and course first.");
+    const b=$("#cpdf"); P.busy(b,true,"Preparing");
+    try{ await RegisterPDF.classRegister({session:{date:$("#eDate").value, course, topic:$("#eTopic").value.trim()}, rows:R, marks:M, by:(session&&session.by)||D.me||EMAIL, me:who(D.me||EMAIL)}); }
+    catch(e){ P.toast("Couldn't create the PDF."); }
+    finally{ P.busy(b,false); }
   };
   renderList(); renderSum();
 }
