@@ -12,7 +12,7 @@
 <style>
   body{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
   /* tab bar: bottom on phones, top segmented on wider screens */
-  .tabs{position:fixed;left:0;right:0;bottom:0;z-index:30;display:grid;grid-template-columns:repeat(3,1fr);
+  .tabs{position:fixed;left:0;right:0;bottom:0;z-index:30;display:grid;grid-template-columns:repeat(4,1fr);
     padding:6px 8px calc(6px + env(safe-area-inset-bottom,0px));border-top:.5px solid var(--sep);
     background:color-mix(in srgb,var(--surface) 82%,transparent);backdrop-filter:saturate(180%) blur(20px);-webkit-backdrop-filter:saturate(180%) blur(20px)}
   .tabs button{border:0;background:none;color:var(--label-3);display:flex;flex-direction:column;align-items:center;gap:3px;min-height:48px;
@@ -71,6 +71,10 @@
   .fb .meta{font:var(--t-footnote);color:var(--label-3)}
   .cat{font:600 12px/1 var(--font);padding:5px 9px;border-radius:999px;background:var(--accent-soft);color:var(--accent)}
   .login{max-width:420px;margin:0 auto}
+  td.topic{min-width:320px;white-space:normal;overflow-wrap:anywhere;line-height:1.35}
+  td.topic.none{color:var(--label-3);font-style:italic}
+  .pinc{white-space:nowrap}
+  .pinc .btn{margin-left:6px}
 </style>
 </head>
 <body>
@@ -106,6 +110,7 @@ const STATUSES=["Present","Absent","Excused"];
 const ICON={
   register:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="2.5"/><path d="M8 8h8M8 12h8M8 16h5"/></svg>`,
   students:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="9" cy="8" r="3.2"/><path d="M3.5 19c.8-3.2 3-5 5.5-5s4.7 1.8 5.5 5"/><circle cx="17" cy="9" r="2.4"/><path d="M15.8 14.2c2.3.2 3.9 1.8 4.7 4.8"/></svg>`,
+  thesis:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 8.5 12 4l9.5 4.5L12 13z"/><path d="M6.5 10.5V15c0 1.4 2.5 3 5.5 3s5.5-1.6 5.5-3v-4.5"/><path d="M21.5 8.5V14"/></svg>`,
   feedback:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" aria-hidden="true"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3h11A2.5 2.5 0 0 1 20 5.5v8a2.5 2.5 0 0 1-2.5 2.5H10l-4.5 4v-4h0A1.5 1.5 0 0 1 4 14.5z"/></svg>`
 };
 const searchIcon=`<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>`;
@@ -116,7 +121,7 @@ function viewLogin(err=""){
   app.innerHTML=`
   <div class="login fade">
     <h1 class="large-title">Sign In</h1>
-    <p class="lede">Take the class register, review students and read feedback.</p>
+    <p class="lede">Take the class register, review students, thesis topics and feedback, and reset student PINs.</p>
     <form id="lf" class="stack" novalidate>
       <div class="field"><label for="email">Admin email</label>
         <input id="email" class="input" type="email" inputmode="email" autocomplete="username" value="${esc(EMAIL)}" placeholder="you@gmail.com"></div>
@@ -148,11 +153,11 @@ async function reload(){ D=await api({action:"admin"}); renderTabs(); }
 function startApp(){ $("#topActions").hidden=false; $("#who").textContent=`Class Rep · ${who(D.me||EMAIL)}`; $("#lock").onclick=lock; renderTabs(); show(tab); }
 function renderTabs(){
   const open=(D.feedback||[]).filter(f=>f.status!=="Resolved").length;
-  const items=[["register","Register"],["students","Students"],["feedback","Feedback"]];
+  const items=[["register","Register"],["students","Students"],["thesis","Thesis"],["feedback","Feedback"]];
   $("#tabs").innerHTML=items.map(([k,l])=>`<button type="button" data-tab="${k}" ${k===tab?'aria-current="page"':""}>${ICON[k]}<span>${l}</span>${k==="feedback"&&open?`<span class="badge" aria-label="${open} open">${open}</span>`:""}</button>`).join("");
   $("#tabs").querySelectorAll("button").forEach(b=>b.onclick=()=>show(b.dataset.tab));
 }
-function show(t){ tab=t; renderTabs(); ({register:viewRegister, students:viewStudents, feedback:viewFeedback})[t](); window.scrollTo({top:0}); }
+function show(t){ tab=t; renderTabs(); ({register:viewRegister, students:viewStudents, thesis:viewThesis, feedback:viewFeedback})[t](); window.scrollTo({top:0}); }
 
 /* ───────── register list ───────── */
 let rCourse="";
@@ -358,8 +363,9 @@ function viewStudents(){
       <label class="search">${searchIcon}<input id="q" type="search" placeholder="Search name, index or email" value="${esc(sQ)}" aria-label="Search students"></label>
       <div class="seg" role="radiogroup" aria-label="Filter">${["All","Verified","Correction requested","Not verified"].map(f=>`<button type="button" data-f="${f}" aria-pressed="${f===sFilter}">${f==="Correction requested"?"Corrections":f}</button>`).join("")}</div>
     </div>
+    <p class="section-f" style="margin-top:var(--s3)">Students set their own 6-digit PIN. If one forgets it, tap Reset PIN; they'll create a new PIN the next time they sign in. Nobody can see a student's PIN.</p>
     <div class="tablewrap" style="margin-top:var(--s3)"><table>
-      <thead><tr>${[["name","Name"],["idx","Index No."],["status","Details"],["pct","Attendance"],["present","P"],["absent","A"],["excused","E"],["schoolEmail","School email"],["personalEmail","Personal email"],[null,"Correction"]]
+      <thead><tr>${[["name","Name"],["idx","Index No."],["status","Details"],["pct","Attendance"],["present","P"],["absent","A"],["excused","E"],["pinSet","PIN"],["schoolEmail","School email"],["personalEmail","Personal email"],[null,"Correction"]]
         .map(([k,l])=>`<th ${k?`data-k="${k}"`:""} scope="col">${l}${sSort.k===k?(sSort.d>0?" ↑":" ↓"):""}</th>`).join("")}</tr></thead>
       <tbody id="tb"></tbody></table></div>
   </div>`;
@@ -367,6 +373,7 @@ function viewStudents(){
     const k=sQ.toLowerCase();
     let L=R.filter(r=>(sFilter==="All"||r.status===sFilter)&&(!k||r.name.toLowerCase().includes(k)||r.idx.includes(k)||(r.schoolEmail||"").includes(k)||(r.personalEmail||"").includes(k)));
     L=L.slice().sort((a,b)=>{ const A=sSort.k==="pct"?(pct(a)??-1):a[sSort.k], B=sSort.k==="pct"?(pct(b)??-1):b[sSort.k];
+      if(typeof A==="boolean"){ return ((A?1:0)-(B?1:0))*sSort.d; }
       return (typeof A==="number"?A-B:String(A||"").localeCompare(String(B||""),"en",{sensitivity:"base"}))*sSort.d; });
     $("#tb").innerHTML=L.length?L.map(r=>{
       const p=pct(r);
@@ -375,15 +382,82 @@ function viewStudents(){
       return `<tr><td class="n">${esc(r.name)}</td><td class="m">${esc(r.idx)}</td><td><span class="pill ${pc}">${esc(r.status==="Correction requested"?"Correction":r.status)}</span></td>
         <td class="num" style="font-weight:600;color:${p==null?"var(--label-3)":p>=75?"var(--present)":p>=50?"var(--excused)":"var(--absent)"}">${p==null?"–":p+"%"}</td>
         <td class="num">${r.present}</td><td class="num">${r.absent}</td><td class="num">${r.excused}</td>
+        <td class="pinc">${r.pinSet?`<span class="pill ok" title="${esc(r.pinSetOn?"Set "+r.pinSetOn:"")}">Set</span><button class="btn btn-gray btn-sm" type="button" data-reset="${esc(r.idx)}" data-name="${esc(r.name)}">Reset PIN</button>`:`<span class="pill none">Not set</span>`}</td>
         <td>${r.schoolEmail?`<a href="mailto:${esc(r.schoolEmail)}">${esc(r.schoolEmail)}</a>`:"—"}</td>
         <td>${r.personalEmail?`<a href="mailto:${esc(r.personalEmail)}">${esc(r.personalEmail)}</a>`:"—"}</td>
         <td style="font:var(--t-footnote);color:var(--label-2)">${fix}</td></tr>`;}).join("")
-      :`<tr><td colspan="10" style="text-align:center;color:var(--label-3);padding:28px">No students match.</td></tr>`;
+      :`<tr><td colspan="11" style="text-align:center;color:var(--label-3);padding:28px">No students match.</td></tr>`;
   };
   $("#q").addEventListener("input",e=>{ sQ=e.target.value.trim(); draw(); });
+  $("#tb").addEventListener("click", async e=>{
+    const b=e.target.closest("[data-reset]"); if(!b) return;
+    if(b.dataset.armed!=="1"){ b.dataset.armed="1"; b.textContent="Tap to Confirm"; b.classList.replace("btn-gray","btn-tinted"); b.style.color="var(--absent)"; return; }
+    P.busy(b,true,"Resetting");
+    try{
+      await api({action:"resetPin", idx:b.dataset.reset});
+      const r=R.find(x=>x.idx===b.dataset.reset); if(r){ r.pinSet=false; r.pinSetOn=""; }
+      draw(); P.toast(`PIN reset for ${b.dataset.name}. They'll create a new one next time they sign in.`);
+    }catch(err){ P.toast(P.errText(err)); P.busy(b,false); }
+  });
   app.querySelectorAll(".seg [data-f]").forEach(b=>b.onclick=()=>{ sFilter=b.dataset.f; viewStudents(); });
   app.querySelectorAll("th[data-k]").forEach(th=>th.onclick=()=>{ const k=th.dataset.k; sSort={k, d: sSort.k===k?-sSort.d:1}; viewStudents(); });
   $("#xls").onclick=exportExcel;
+  draw();
+}
+
+/* ───────── thesis topics ───────── */
+let tFilter="All", tProg="All", tQ="";
+function thesisRows(){
+  const k=tQ.toLowerCase();
+  return sortedRows().filter(r=>(tFilter==="All"||(tFilter==="Submitted"?!!r.topic:!r.topic))
+    &&(tProg==="All"||r.programme===tProg)
+    &&(!k||r.name.toLowerCase().includes(k)||r.idx.includes(k)||(r.topic||"").toLowerCase().includes(k)));
+}
+function viewThesis(){
+  const R=D.rows||[], sub=R.filter(r=>r.topic);
+  app.innerHTML=`
+  <div class="fade">
+    <div class="titlebar">
+      <h1 class="large-title">Thesis Topics</h1>
+      <div class="hstack"><button class="btn btn-filled btn-sm" id="tpdf" type="button">Download PDF</button></div>
+    </div>
+    <div class="tiles">
+      <div class="tile"><div class="k">Submitted</div><div class="v" style="color:var(--present)">${sub.length}</div></div>
+      <div class="tile"><div class="k">MPhil</div><div class="v">${sub.filter(r=>r.programme==="MPhil").length}</div></div>
+      <div class="tile"><div class="k">MSc</div><div class="v">${sub.filter(r=>r.programme==="MSc").length}</div></div>
+      <div class="tile"><div class="k">Not submitted</div><div class="v" style="color:var(--excused)">${R.length-sub.length}</div></div>
+    </div>
+    <div class="hstack" style="margin-top:var(--s5)">
+      <label class="search">${searchIcon}<input id="q" type="search" placeholder="Search name, index or topic" value="${esc(tQ)}" aria-label="Search thesis topics"></label>
+      <div class="seg" role="radiogroup" aria-label="Submission filter">${["All","Submitted","Not submitted"].map(f=>`<button type="button" data-f="${f}" aria-pressed="${f===tFilter}">${f}</button>`).join("")}</div>
+      <div class="seg" role="radiogroup" aria-label="Programme filter">${["All","MPhil","MSc"].map(f=>`<button type="button" data-p="${f}" aria-pressed="${f===tProg}">${f==="All"?"Both":f}</button>`).join("")}</div>
+    </div>
+    <p class="section-f" style="margin-top:var(--s3)">The PDF includes the students shown below, sorted by name.</p>
+    <div class="tablewrap" style="margin-top:var(--s2)"><table style="min-width:860px">
+      <thead><tr><th scope="col">Date</th><th scope="col">Index No.</th><th scope="col">Full Name</th><th scope="col">Programme</th><th scope="col">Thesis Topic</th></tr></thead>
+      <tbody id="tb"></tbody></table></div>
+  </div>`;
+  const draw=()=>{
+    const L=thesisRows();
+    $("#tb").innerHTML=L.length?L.map(r=>`<tr>
+      <td style="white-space:nowrap">${r.topic?esc(P.fmtDate(r.thesisUpdated||r.thesisSubmitted)):"—"}</td>
+      <td class="m">${esc(r.idx)}</td><td class="n">${esc(r.name)}</td>
+      <td>${r.programme?`<span class="pill ok">${esc(r.programme)}</span>`:"—"}</td>
+      <td class="topic ${r.topic?"":"none"}">${r.topic?esc(r.topic):"Not submitted"}</td></tr>`).join("")
+      :`<tr><td colspan="5" style="text-align:center;color:var(--label-3);padding:28px">No students match.</td></tr>`;
+  };
+  $("#q").addEventListener("input",e=>{ tQ=e.target.value.trim(); draw(); });
+  app.querySelectorAll("[data-f]").forEach(b=>b.onclick=()=>{ tFilter=b.dataset.f; viewThesis(); });
+  app.querySelectorAll("[data-p]").forEach(b=>b.onclick=()=>{ tProg=b.dataset.p; viewThesis(); });
+  $("#tpdf").onclick=async ()=>{
+    if(!window.RegisterPDF||!RegisterPDF.ready()) return P.toast("PDF tools couldn't load. Check your connection and refresh.");
+    const L=thesisRows(); if(!L.length) return P.toast("No students to include.");
+    const parts=[tProg!=="All"?tProg:"", tFilter==="Not submitted"?"Not Yet Submitted":""].filter(Boolean);
+    const b=$("#tpdf"); P.busy(b,true,"Preparing");
+    try{ await RegisterPDF.thesisList({rows:L, title:"Student Thesis Topics"+(parts.length?" · "+parts.join(" · "):""), me:who(D.me||EMAIL)}); }
+    catch(e){ P.toast("Couldn't create the PDF."); }
+    finally{ P.busy(b,false); }
+  };
   draw();
 }
 
@@ -438,7 +512,8 @@ async function exportExcel(){
     const ws2=XLSX.utils.aoa_to_sheet(bc); ws2["!cols"]=[{wch:32},{wch:13},...courses.map(()=>({wch:12})),{wch:10}];
     XLSX.utils.book_append_sheet(wb,ws2,"By Course");
     XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(S.map(s=>({Date:s.date,Course:s.course,Lecturer:(window.TIMETABLE.find(s.course)||{}).lecturer||"",Topic:s.topic,Present:s.counts.Present,Absent:s.counts.Absent,Excused:s.counts.Excused,"Taken By":s.by||""}))),"Classes");
-    XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(R.map(r=>({Name:r.name,"Index No.":r.idx,Details:r.status,"Confirmed On":r.date,"Correct Name":r.newName,"Correct Index No.":r.newIdx,Note:r.note,"School Email":r.schoolEmail,"Personal Email":r.personalEmail,Present:r.present,Absent:r.absent,Excused:r.excused,"Attendance %":pct(r)==null?"":pct(r)+"%"}))),"Students");
+    XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(R.map(r=>({Name:r.name,"Index No.":r.idx,Details:r.status,"Confirmed On":r.date,"Correct Name":r.newName,"Correct Index No.":r.newIdx,Note:r.note,"School Email":r.schoolEmail,"Personal Email":r.personalEmail,Present:r.present,Absent:r.absent,Excused:r.excused,"Attendance %":pct(r)==null?"":pct(r)+"%","PIN":r.pinSet?"Set":"Not set"}))),"Students");
+    XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(R.map(r=>({Date:(r.thesisUpdated||r.thesisSubmitted||"").slice(0,10),"Index No.":r.idx,"Full Name":r.name,Programme:r.programme,"Thesis Topic":r.topic||"Not submitted"}))),"Thesis");
     XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet((D.feedback||[]).map(f=>({Date:f.date,"Index No.":f.idx,Name:f.name,Category:f.category,Details:f.details,Class:f.session,Contact:f.contact,Status:f.status,"Handled By":f.by||""}))),"Feedback");
     XLSX.writeFile(wb,`GCTU-MSc-IT-Jan2026-register-${P.today()}.xlsx`);
   }catch(e){ P.toast(P.errText(e)); }

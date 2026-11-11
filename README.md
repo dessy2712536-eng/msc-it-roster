@@ -2,10 +2,14 @@
 
 | Page | Who | What it does |
 |---|---|---|
-| `index.html` | Students | Enter index number → next class, attendance ring, attendance per course, every class, timetable; confirm name & index, add emails, report an issue |
-| `admin.html` | Class reps (2 admins) | Take the register (Present / Absent / Excused), edit or delete past classes, see students & emails, read feedback, download Excel |
+| `index.html` | Students | Enter index number + 6-digit PIN → thesis topic, next class, attendance ring, attendance per course, every class, timetable; confirm name & index, add emails, report an issue |
+| `admin.html` | Class reps (2 admins) | Take the register (Present / Absent / Excused), edit or delete past classes, see students & emails, reset student PINs, thesis topics (PDF), read feedback, download Excel |
 
 Every issue a student reports is **emailed to both admins** and listed on the Feedback tab.
+
+**Student PINs.** After entering their index number, each student creates a 6-digit PIN on their first visit and enters it every time after that. Their attendance, details and thesis topic are only shown, and can only be changed, with the PIN. PINs are stored as salted hashes on the `PINs` tab, so nobody can read them. Five wrong tries lock that index for 15 minutes. "Forgot PIN?" emails the admins, who reset it on **Students → Reset PIN**, and the student then creates a new one.
+
+**Thesis topics.** Students choose MPhil or MSc and enter their thesis topic, which is saved on the `Thesis` tab. Admins see all topics on the **Thesis** tab and can download a PDF (Date, Index No., Full Name, Programme, Thesis Topic) filtered by programme or submission status.
 No student data lives in this repository — it is all in a private Google Sheet reached through Apps Script.
 
 ```
