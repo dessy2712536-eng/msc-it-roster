@@ -311,14 +311,18 @@ function viewHome(){
     </div>
 
     <h2 class="section-h">Thesis Topic</h2>
+    ${s.thesisDeadline?`<div class="banner ${s.thesisOpen?"ok":"err"}" style="margin-bottom:var(--s3)"><span class="ic">${s.thesisOpen?"✓":"!"}</span><span>${s.thesisOpen
+      ?`Deadline: <b>${esc(P.fmtDeadline(s.thesisDeadline))}</b> (Ghana time).${s.thesis&&s.thesis.topic?" You can edit your topic until then.":""}`
+      :`Submissions closed on <b>${esc(P.fmtDeadline(s.thesisDeadline))}</b>.${s.thesis&&s.thesis.topic?"":" Contact the class rep if you haven't submitted."}`}</span></div>`:""}
     <div class="group">
       ${s.thesis&&s.thesis.topic?`
       <div class="row" style="display:block">
         <div class="hstack" style="gap:var(--s2)"><span class="pill ok">${esc(s.thesis.programme)}</span><span class="sub">Submitted ${esc(P.fmtDate(s.thesis.submitted,true))}${s.thesis.updated&&s.thesis.updated.slice(0,10)!==s.thesis.submitted.slice(0,10)?` · edited ${esc(P.fmtDate(s.thesis.updated))}`:""}</span></div>
         <div class="thesis-t">${esc(s.thesis.topic)}</div>
       </div>
-      <button class="row" id="thesis" type="button"><span class="grow" style="color:var(--accent)">Edit Thesis Topic</span></button>`
-      :`<div class="row" style="display:block"><div>You haven't submitted your thesis topic yet.</div><div class="sub">Choose MPhil or MSc and enter your topic. You can edit it later.</div></div>
+      ${s.thesisOpen!==false?`<button class="row" id="thesis" type="button"><span class="grow" style="color:var(--accent)">Edit Thesis Topic</span></button>`:""}`
+      :s.thesisOpen===false?`<div class="row" style="display:block"><div>You didn't submit a thesis topic before the deadline.</div></div>`
+      :`<div class="row" style="display:block"><div>You haven't submitted your thesis topic yet.</div><div class="sub">Choose MPhil or MSc and enter your topic. You can edit it ${s.thesisDeadline?"until the deadline":"later"}.</div></div>
       <div style="padding:0 var(--s4) var(--s4)"><button class="btn btn-filled" id="thesis" type="button">Submit Thesis Topic</button></div>`}
     </div>
 
@@ -384,7 +388,7 @@ function viewHome(){
   $("#switch").onclick=signOut;
   $("#signout").onclick=signOut;
   $("#chpin").onclick=sheetChangePin;
-  $("#thesis").onclick=sheetThesis;
+  if($("#thesis")) $("#thesis").onclick=sheetThesis;
   $("#confirm").onclick=sheetConfirm;
   $("#report").onclick=()=>sheetReport();
   app.querySelectorAll("[data-sid]").forEach(b=>b.onclick=()=>sheetReport("attendance", b.dataset.sid));
@@ -474,6 +478,7 @@ function sheetThesis(){
         const btn=$("#send"); P.busy(btn,true,"Saving");
         try{
           const r=await sCall({action:"thesis", programme:prog, topic});
+          if(!r.ok && r.error==="thesis_closed"){ me.thesisOpen=false; if(r.deadline) me.thesisDeadline=r.deadline; P.closeSheet(); viewHome(); P.toast("Thesis submissions are closed"); return; }
           if(!r.ok) throw new Error(r.error);
           me.thesis=r.thesis; P.closeSheet(); viewHome(); P.toast(t.topic?"Thesis topic updated":"Thesis topic submitted");
         }catch(err){ if(!document.body.contains(btn)) return; fail(P.errText(err)); P.busy(btn,false); }
