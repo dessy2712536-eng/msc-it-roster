@@ -1,6 +1,6 @@
 /**
  * GCTU · MPhil/MSc Information Technology · January 2026 Cohort
- * Class Portal back end (roster verification, class register, feedback)
+ * Class Portal back end (roster verification, class register, feedback, thesis topics, student PINs)
  *
  * SETUP
  *  1. In the Google Sheet: Extensions → Apps Script → paste this file → Save.
@@ -13,7 +13,10 @@
  *  Never write passwords in this file – it is public on GitHub.
  *
  * Sheet tabs (created automatically if missing):
- *  Master List · Log · Sessions · Attendance · Register · Feedback
+ *  Master List · Log · Sessions · Attendance · Register · Feedback · Thesis · PINs
+ *
+ * Student PINs are stored only as salted SHA-256 hashes – nobody (admins included) can read a PIN.
+ * Admins can reset a PIN from the Students tab; the student then creates a new one.
  */
 /* ═══════════ RUN THIS FIRST: choose "setup" in the function dropdown above and click Run ═══════════ */
 function setup() {
@@ -37,22 +40,28 @@ const TZ = 'Africa/Accra';
 const STATUSES = ['Present', 'Absent', 'Excused'];
 const T = {
   MASTER: 'Master List', LOG: 'Log', SESSIONS: 'Sessions',
-  ATT: 'Attendance', REGISTER: 'Register', FEEDBACK: 'Feedback'
+  ATT: 'Attendance', REGISTER: 'Register', FEEDBACK: 'Feedback',
+  THESIS: 'Thesis', PINS: 'PINs'
 };
 const HEAD = {
   'Master List': ['No.', 'Name', 'Index No.', 'Status', 'Verified On', 'Correct Name', 'Correct Index No.', 'Note', 'School Email', 'Personal Email'],
   'Log': ['Timestamp', 'Action', 'Index No.', 'Name', 'Details'],
   'Sessions': ['Session ID', 'Date', 'Course', 'Topic', 'Created', 'Updated', 'Updated By'],
   'Attendance': ['Session ID', 'Index No.', 'Status'],
-  'Feedback': ['Timestamp', 'Index No.', 'Name', 'Category', 'Details', 'Session', 'Contact Email', 'Status', 'Handled By']
+  'Feedback': ['Timestamp', 'Index No.', 'Name', 'Category', 'Details', 'Session', 'Contact Email', 'Status', 'Handled By'],
+  'Thesis': ['Index No.', 'Name', 'Programme', 'Thesis Topic', 'Submitted', 'Updated'],
+  'PINs': ['Index No.', 'PIN Hash', 'Salt', 'Set On']
 };
+const PROGRAMMES = ['MPhil', 'MSc'];
+const PIN_TRIES = 5, PIN_LOCK_SECS = 900;
 const COL = { status: 4, date: 5, newName: 6, newIdx: 7, note: 8, school: 9, personal: 10 };
 const CATEGORIES = { name: 'Name spelling', index: 'Index number', attendance: 'Attendance record', other: 'Other' };
 
 /* ───────────────────────── entry points ───────────────────────── */
 function doGet(e) {
   const p = (e && e.parameter) || {};
-  if (p.action === 'lookup') return json_(lookup_(p.idx));
+  // Lookups now need a PIN, so GET only says whether the index exists and has a PIN (no personal data)
+  if (p.action === 'lookup' || p.action === 'check') return json_(check_(p.idx));
   return json_({ ok: true, service: 'class-portal' });
 }
 
@@ -75,17 +84,183 @@ function route_(d) {
     getSession: () => getSession_(d.id),
     saveSession: who => saveSession_(d, who),
     deleteSession: who => deleteSession_(d.id, who),
-    setFeedback: who => setFeedback_(d.row, d.status, who)
+    setFeedback: who => setFeedback_(d.row, d.status, who),
+    resetPin: who => resetPin_(d.idx, who)
   };
   if (admin[a]) {
     const who = adminEmail_(d.email, d.key);
     if (who.error) return { ok: false, error: who.error };
     return admin[a](who.email);
   }
-  if (a === 'confirm') return confirm_(d);
-  if (a === 'feedback') return feedback_(d);
+  // student actions that need the student's PIN
+  const student = {
+    login: () => lookup_(d.idx),
+    confirm: () => confirm_(d),
+    feedback: () => feedback_(d),
+    thesis: () => thesis_(d),
+    changePin: () => changePin_(d)
+  };
+  if (student[a]) {
+    const gate = pinGate_(d.idx, d.pin);
+    if (gate.error) return { ok: false, error: gate.error, triesLeft: gate.triesLeft };
+    return student[a]();
+  }
+  if (a === 'check') return check_(d.idx);
+  if (a === 'setPin') return setPin_(d);
+  if (a === 'pinHelp') return pinHelp_(d);
   if (a === 'missing') return missing_(d);
   return { ok: false, error: 'unknown_action' };
+}
+
+/* ───────────────────────── student PINs ───────────────────────── */
+function check_(idx) {
+  idx = digits_(idx);
+  if (!idx) return { ok: false, error: 'invalid_index' };
+  if (findRow_(tab_(T.MASTER), idx) < 0) return { ok: true, found: false };
+  return { ok: true, found: true, hasPin: findRowBy_(tab_(T.PINS), 1, idx) > 0, locked: locked_(idx) };
+}
+
+/* First visit: student creates a PIN (only allowed while no PIN exists for that index) */
+function setPin_(d) {
+  const idx = digits_(d.idx);
+  if (!idx) return { ok: false, error: 'invalid_index' };
+  const pin = String(d.pin || '');
+  const bad = weakPin_(pin);
+  if (bad) return { ok: false, error: bad };
+  const ms = tab_(T.MASTER);
+  const r = findRow_(ms, idx);
+  if (r < 0) return { ok: false, error: 'not_found' };
+  const ps = tab_(T.PINS);
+  if (findRowBy_(ps, 1, idx) > 0) return { ok: false, error: 'pin_exists' };
+  writePin_(ps, -1, idx, pin, now_());
+  log_(now_(), 'PIN created', idx, ms.getRange(r, 2).getDisplayValue(), '');
+  return lookup_(idx);
+}
+
+function changePin_(d) {
+  const idx = digits_(d.idx);
+  const bad = weakPin_(String(d.newPin || ''));
+  if (bad) return { ok: false, error: bad };
+  const ps = tab_(T.PINS);
+  const r = findRowBy_(ps, 1, idx);
+  if (r < 0) return { ok: false, error: 'no_pin' };
+  writePin_(ps, r, idx, String(d.newPin), now_());
+  log_(now_(), 'PIN changed', idx, '', 'by student');
+  return { ok: true };
+}
+
+/* Checks idx + PIN. Locks the index for 15 minutes after 5 wrong tries. */
+function pinGate_(idx, pin) {
+  idx = digits_(idx);
+  if (!idx) return { error: 'invalid_index' };
+  if (locked_(idx)) return { error: 'pin_locked' };
+  const ps = tab_(T.PINS);
+  const r = findRowBy_(ps, 1, idx);
+  if (r < 0) return { error: 'no_pin' };
+  const v = ps.getRange(r, 1, 1, 3).getDisplayValues()[0];
+  if (/^\d{6}$/.test(String(pin || '')) && hash_(v[2], idx, String(pin)) === v[1]) {
+    CacheService.getScriptCache().remove('pinfail_' + idx);
+    return { ok: true };
+  }
+  const c = CacheService.getScriptCache();
+  const n = Number(c.get('pinfail_' + idx) || 0) + 1;
+  c.put('pinfail_' + idx, String(n), PIN_LOCK_SECS);
+  Utilities.sleep(600);
+  if (n >= PIN_TRIES) {
+    log_(now_(), 'PIN locked', idx, '', PIN_TRIES + ' wrong PIN attempts');
+    return { error: 'pin_locked' };
+  }
+  return { error: 'wrong_pin', triesLeft: PIN_TRIES - n };
+}
+function locked_(idx) { return Number(CacheService.getScriptCache().get('pinfail_' + idx) || 0) >= PIN_TRIES; }
+
+/* Student forgot PIN → tell the admins (no PIN needed, rate limited) */
+function pinHelp_(d) {
+  const idx = digits_(d.idx);
+  if (!idx) return { ok: false, error: 'invalid_index' };
+  const r = findRow_(tab_(T.MASTER), idx);
+  if (r < 0) return { ok: false, error: 'not_found' };
+  if (tooMany_(idx)) return { ok: false, error: 'rate_limited' };
+  const name = tab_(T.MASTER).getRange(r, 2).getDisplayValue();
+  const contact = cleanEmail_(d.contactEmail);
+  const now = now_();
+  const fb = tab_(T.FEEDBACK);
+  const row = fb.getLastRow() + 1;
+  fb.getRange(row, 2).setNumberFormat('@');
+  fb.getRange(row, 1, 1, 8).setValues([[now, idx, name, 'PIN reset', 'Student forgot their PIN and asked for a reset.', '', contact, 'Open']]);
+  log_(now, 'PIN reset requested', idx, name, '');
+  notify_('[Class Portal] PIN reset request – ' + name,
+    name + ' (' + idx + ') forgot their portal PIN.\n\nOpen the admin page → Students → find them → Reset PIN.' +
+    '\nThey can then create a new PIN the next time they sign in.' + (contact ? '\n\nReply to: ' + contact : ''), contact);
+  return { ok: true };
+}
+
+function resetPin_(idx, who) {
+  idx = digits_(idx);
+  if (!idx) return { ok: false, error: 'invalid_index' };
+  const ps = tab_(T.PINS);
+  const r = findRowBy_(ps, 1, idx);
+  if (r < 0) return { ok: false, error: 'no_pin' };
+  ps.deleteRow(r);                              // the reset itself is recorded on the Log tab
+  CacheService.getScriptCache().remove('pinfail_' + idx);
+  const ms = tab_(T.MASTER);
+  const mr = findRow_(ms, idx);
+  log_(now_(), 'PIN reset', idx, mr > 0 ? ms.getRange(mr, 2).getDisplayValue() : '', 'by ' + (who || '?'));
+  return { ok: true };
+}
+
+function writePin_(ps, row, idx, pin, when) {
+  const salt = Utilities.getUuid();
+  if (row < 0) row = ps.getLastRow() + 1;
+  ps.getRange(row, 1).setNumberFormat('@');
+  ps.getRange(row, 1, 1, 4).setValues([[idx, hash_(salt, idx, pin), salt, when]]);
+}
+function hash_(salt, idx, pin) {
+  return Utilities.computeDigest(Utilities.DigestAlgorithm.SHA_256, salt + '|' + idx + '|' + pin, Utilities.Charset.UTF_8)
+    .map(b => ('0' + (b & 255).toString(16)).slice(-2)).join('');
+}
+function weakPin_(pin) {
+  if (!/^\d{6}$/.test(pin)) return 'pin_format';
+  if (/^(\d)\1{5}$/.test(pin) || '0123456789'.indexOf(pin) >= 0 || '9876543210'.indexOf(pin) >= 0) return 'pin_weak';
+  return '';
+}
+
+/* ───────────────────────── thesis topics ───────────────────────── */
+function thesis_(d) {
+  const idx = digits_(d.idx);
+  const prog = PROGRAMMES.indexOf(d.programme) >= 0 ? d.programme : '';
+  if (!prog) return { ok: false, error: 'programme_required' };
+  const topic = safe_(d.topic, 300);
+  if (topic.length < 10) return { ok: false, error: 'topic_required' };
+  const ms = tab_(T.MASTER);
+  const r = findRow_(ms, idx);
+  if (r < 0) return { ok: false, error: 'not_found' };
+  const name = ms.getRange(r, 2).getDisplayValue();
+  const th = tab_(T.THESIS);
+  const now = now_();
+  const tr = findRowBy_(th, 1, idx);
+  const row = tr > 0 ? tr : th.getLastRow() + 1;
+  const submitted = tr > 0 ? th.getRange(tr, 5).getDisplayValue() : now;
+  th.getRange(row, 1).setNumberFormat('@');
+  th.getRange(row, 1, 1, 6).setValues([[idx, name, prog, topic, submitted, now]]);
+  log_(now, tr > 0 ? 'Thesis topic updated' : 'Thesis topic submitted', idx, name, prog + ' · ' + topic);
+  return { ok: true, thesis: { programme: prog, topic: topic, submitted: submitted, updated: now } };
+}
+function readThesis_() {
+  const th = tab_(T.THESIS);
+  const l = th.getLastRow();
+  const o = {};
+  if (l >= 2) th.getRange(2, 1, l - 1, 6).getDisplayValues().forEach(r => {
+    if (r[0]) o[String(r[0]).trim()] = { programme: r[2], topic: String(r[3]).replace(/^'/, ''), submitted: r[4], updated: r[5] };
+  });
+  return o;
+}
+function pinSet_() {
+  const ps = tab_(T.PINS);
+  const l = ps.getLastRow();
+  const o = {};
+  if (l >= 2) ps.getRange(2, 1, l - 1, 4).getDisplayValues().forEach(r => { if (r[0] && r[1]) o[String(r[0]).trim()] = r[3] || true; });
+  return o;
 }
 
 /* ───────────────────────── student side ───────────────────────── */
@@ -99,6 +274,7 @@ function lookup_(idx) {
   return {
     ok: true, found: true, name: v[1], idx: v[2], status: v[3] || 'Not verified', verifiedOn: v[4],
     schoolEmail: v[8], personalEmail: v[9],
+    thesis: readThesis_()[idx] || null,
     attendance: studentAttendance_(idx)
   };
 }
@@ -234,12 +410,18 @@ function adminData_() {
     (per[m.idx] = per[m.idx] || { Present: 0, Absent: 0, Excused: 0 })[m.status]++;
     (perSession[m.id] = perSession[m.id] || { Present: 0, Absent: 0, Excused: 0 })[m.status]++;
   });
+  const thesis = readThesis_();
+  const pins = pinSet_();
   const rows = last < 2 ? [] : sh.getRange(2, 1, last - 1, 10).getDisplayValues().filter(r => r[2]).map(r => {
     const c = per[r[2]] || { Present: 0, Absent: 0, Excused: 0 };
+    const t = thesis[String(r[2]).trim()] || {};
+    const pin = pins[String(r[2]).trim()];
     return {
       no: r[0], name: r[1], idx: r[2], status: r[3] || 'Not verified', date: r[4],
       newName: r[5], newIdx: r[6], note: r[7], schoolEmail: r[8], personalEmail: r[9],
-      present: c.Present, absent: c.Absent, excused: c.Excused
+      present: c.Present, absent: c.Absent, excused: c.Excused,
+      pinSet: !!pin, pinSetOn: pin === true ? '' : (pin || ''),
+      programme: t.programme || '', topic: t.topic || '', thesisSubmitted: t.submitted || '', thesisUpdated: t.updated || ''
     };
   });
   const fb = tab_(T.FEEDBACK);

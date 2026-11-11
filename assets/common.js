@@ -31,7 +31,16 @@
     no_marks:"Mark at least one student before saving.",
     course_required:"Enter the course for this class.",
     invalid_date:"Pick the date of the class.",
-    not_found:"That record wasn't found. Refresh and try again."
+    not_found:"That record wasn't found. Refresh and try again.",
+    wrong_pin:"That PIN isn't right. Try again.",
+    pin_locked:"Too many wrong PINs. This index number is locked for 15 minutes. If you've forgotten your PIN, tap Forgot PIN.",
+    no_pin:"No PIN is set for this index number yet. Go back and create one.",
+    pin_exists:"A PIN has already been created for this index number. Enter it, or tap Forgot PIN if it wasn't you.",
+    pin_format:"Your PIN must be exactly 6 digits.",
+    pin_weak:"That PIN is too easy to guess. Avoid repeated digits (111111) or runs (123456).",
+    programme_required:"Choose MPhil or MSc.",
+    topic_required:"Enter your thesis topic (at least 10 characters).",
+    invalid_status:"That status isn't valid."
   };
   const errText = e => MSG[e && e.message] || MSG[e] || (e && e.name==="AbortError" ? MSG.network : (e instanceof TypeError ? MSG.network : MSG.network));
 

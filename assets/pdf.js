@@ -113,5 +113,27 @@
     doc.save(`Register-${course?safeName(course.split(" · ")[0]):"All-Courses"}-${new Date().toISOString().slice(0,10)}.pdf`);
   }
 
-  window.RegisterPDF={ready, classRegister, fullRegister};
+  /* Thesis topics: Date, Index No., Full Name, Programme, Thesis Topic */
+  async function thesisList({rows, title, me}){
+    const L=await logo();
+    const doc=new window.jspdf.jsPDF({unit:"mm",format:"a4",orientation:"landscape"});
+    let y=letterhead(doc,L,title||"Student Thesis Topics");
+    const sub=rows.filter(r=>r.topic);
+    y=details(doc,y,[
+      ["Students listed",rows.length],["Topics submitted",sub.length],
+      ["MPhil",sub.filter(r=>r.programme==="MPhil").length],["MSc",sub.filter(r=>r.programme==="MSc").length]
+    ]);
+    const d = iso => { const m=/^(\d{4})-(\d{2})-(\d{2})/.exec(iso||""); return m?new Date(+m[1],+m[2]-1,+m[3]).toLocaleDateString("en-GB",{day:"numeric",month:"short",year:"numeric"}):""; };
+    doc.autoTable({...tableStyle, startY:y+2,
+      head:[["No.","Date","Index No.","Full Name","Programme","Thesis Topic"]],
+      body:rows.map((r,i)=>[i+1, d(r.thesisUpdated||r.thesisSubmitted)||"—", r.idx, r.name, r.programme||"—", r.topic||"Not submitted"]),
+      styles:{...tableStyle.styles, fontSize:9, cellPadding:2.2, valign:"top"},
+      columnStyles:{0:{cellWidth:11,halign:"right"},1:{cellWidth:25},2:{cellWidth:27},3:{cellWidth:58,fontStyle:"bold"},4:{cellWidth:23},5:{cellWidth:"auto"}},
+      didParseCell:c=>{ if(c.section==="body"&&c.column.index===5&&c.cell.raw==="Not submitted"){ c.cell.styles.textColor=GREY; c.cell.styles.fontStyle="italic"; } }
+    });
+    footers(doc, me);
+    doc.save(`Thesis-Topics-${new Date().toISOString().slice(0,10)}.pdf`);
+  }
+
+  window.RegisterPDF={ready, classRegister, fullRegister, thesisList};
 })();
