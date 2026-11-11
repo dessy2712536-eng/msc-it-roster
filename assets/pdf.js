@@ -114,14 +114,15 @@
   }
 
   /* Thesis topics: Date, Index No., Full Name, Programme, Thesis Topic */
-  async function thesisList({rows, title, me}){
+  async function thesisList({rows, title, me, deadline}){
     const L=await logo();
     const doc=new window.jspdf.jsPDF({unit:"mm",format:"a4",orientation:"landscape"});
     let y=letterhead(doc,L,title||"Student Thesis Topics");
     const sub=rows.filter(r=>r.topic);
     y=details(doc,y,[
       ["Students listed",rows.length],["Topics submitted",sub.length],
-      ["MPhil",sub.filter(r=>r.programme==="MPhil").length],["MSc",sub.filter(r=>r.programme==="MSc").length]
+      ["MPhil",sub.filter(r=>r.programme==="MPhil").length],["MSc",sub.filter(r=>r.programme==="MSc").length],
+      ...(deadline?[["Deadline",deadline],["",""]]:[])
     ]);
     const d = iso => { const m=/^(\d{4})-(\d{2})-(\d{2})/.exec(iso||""); return m?new Date(+m[1],+m[2]-1,+m[3]).toLocaleDateString("en-GB",{day:"numeric",month:"short",year:"numeric"}):""; };
     doc.autoTable({...tableStyle, startY:y+2,

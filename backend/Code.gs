@@ -85,7 +85,8 @@ function route_(d) {
     saveSession: who => saveSession_(d, who),
     deleteSession: who => deleteSession_(d.id, who),
     setFeedback: who => setFeedback_(d.row, d.status, who),
-    resetPin: who => resetPin_(d.idx, who)
+    resetPin: who => resetPin_(d.idx, who),
+    setDeadline: who => setDeadline_(d.deadline, who)
   };
   if (admin[a]) {
     const who = adminEmail_(d.email, d.key);
@@ -228,6 +229,7 @@ function weakPin_(pin) {
 /* ───────────────────────── thesis topics ───────────────────────── */
 function thesis_(d) {
   const idx = digits_(d.idx);
+  if (!thesisOpen_()) return { ok: false, error: 'thesis_closed', deadline: deadline_() };
   const prog = PROGRAMMES.indexOf(d.programme) >= 0 ? d.programme : '';
   if (!prog) return { ok: false, error: 'programme_required' };
   const topic = safe_(d.topic, 300);
@@ -245,6 +247,18 @@ function thesis_(d) {
   th.getRange(row, 1, 1, 6).setValues([[idx, name, prog, topic, submitted, now]]);
   log_(now, tr > 0 ? 'Thesis topic updated' : 'Thesis topic submitted', idx, name, prog + ' · ' + topic);
   return { ok: true, thesis: { programme: prog, topic: topic, submitted: submitted, updated: now } };
+}
+/* Submission deadline (Accra time, "yyyy-MM-dd HH:mm"), kept in Script properties as THESIS_DEADLINE. Empty = no deadline. */
+function deadline_() { return PropertiesService.getScriptProperties().getProperty('THESIS_DEADLINE') || ''; }
+function thesisOpen_() { const dl = deadline_(); return !dl || now_() < dl; }
+function setDeadline_(dl, who) {
+  dl = String(dl || '').trim().replace('T', ' ');
+  const props = PropertiesService.getScriptProperties();
+  if (!dl) props.deleteProperty('THESIS_DEADLINE');
+  else if (/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}$/.test(dl)) props.setProperty('THESIS_DEADLINE', dl);
+  else return { ok: false, error: 'invalid_deadline' };
+  log_(now_(), dl ? 'Thesis deadline set' : 'Thesis deadline removed', '', '', (dl || '—') + ' · by ' + (who || '?'));
+  return { ok: true, thesisDeadline: dl, thesisOpen: thesisOpen_(), now: now_() };
 }
 function readThesis_() {
   const th = tab_(T.THESIS);
@@ -275,6 +289,7 @@ function lookup_(idx) {
     ok: true, found: true, name: v[1], idx: v[2], status: v[3] || 'Not verified', verifiedOn: v[4],
     schoolEmail: v[8], personalEmail: v[9],
     thesis: readThesis_()[idx] || null,
+    thesisDeadline: deadline_(), thesisOpen: thesisOpen_(),
     attendance: studentAttendance_(idx)
   };
 }
@@ -431,6 +446,7 @@ function adminData_() {
   })).reverse();
   return {
     ok: true, updated: now_(), rows: rows,
+    thesisDeadline: deadline_(), thesisOpen: thesisOpen_(),
     sessions: sessions.map(s => Object.assign({}, s, { counts: perSession[s.id] || { Present: 0, Absent: 0, Excused: 0 } })),
     feedback: feedback, matrix: matrix,
     courses: unique_(sessions.map(s => s.course))

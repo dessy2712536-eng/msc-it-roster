@@ -427,6 +427,22 @@ function viewThesis(){
       <div class="tile"><div class="k">MSc</div><div class="v">${sub.filter(r=>r.programme==="MSc").length}</div></div>
       <div class="tile"><div class="k">Not submitted</div><div class="v" style="color:var(--excused)">${R.length-sub.length}</div></div>
     </div>
+    <h2 class="section-h">Submission Deadline</h2>
+    <div class="group">
+      <div class="row" style="flex-wrap:wrap;gap:var(--s3)">
+        <div class="grow" style="min-width:220px">
+          ${D.thesisDeadline
+            ?`<span class="pill ${D.thesisOpen?"ok":"warn"}">${D.thesisOpen?"Open":"Closed"}</span> <span style="margin-left:6px">${D.thesisOpen?"Closes":"Closed"} ${esc(P.fmtDeadline(D.thesisDeadline))}</span>`
+            :`<span class="pill none">No deadline</span> <span class="sub" style="margin-left:6px">Students can submit and edit anytime.</span>`}
+        </div>
+        <input id="dlDate" type="date" class="input" aria-label="Deadline date" style="width:auto;min-height:36px;padding:6px 10px;background:var(--fill)" value="${esc((D.thesisDeadline||"").slice(0,10))}">
+        <input id="dlTime" type="time" class="input" aria-label="Deadline time" style="width:auto;min-height:36px;padding:6px 10px;background:var(--fill)" value="${esc((D.thesisDeadline||"").slice(11,16)||"23:59")}">
+        <button class="btn btn-filled btn-sm" id="dlSave" type="button">${D.thesisDeadline?"Update":"Set Deadline"}</button>
+        ${D.thesisDeadline?`<button class="btn btn-gray btn-sm" id="dlClear" type="button">Remove</button>`:""}
+      </div>
+    </div>
+    <p class="section-f">Ghana time. After the deadline students can still see their topic but can't submit or edit. Move the deadline or remove it to reopen.</p>
+
     <div class="hstack" style="margin-top:var(--s5)">
       <label class="search">${searchIcon}<input id="q" type="search" placeholder="Search name, index or topic" value="${esc(tQ)}" aria-label="Search thesis topics"></label>
       <div class="seg" role="radiogroup" aria-label="Submission filter">${["All","Submitted","Not submitted"].map(f=>`<button type="button" data-f="${f}" aria-pressed="${f===tFilter}">${f}</button>`).join("")}</div>
@@ -447,6 +463,14 @@ function viewThesis(){
       :`<tr><td colspan="5" style="text-align:center;color:var(--label-3);padding:28px">No students match.</td></tr>`;
   };
   $("#q").addEventListener("input",e=>{ tQ=e.target.value.trim(); draw(); });
+  const saveDl=async (value, b)=>{
+    P.busy(b,true,"Saving");
+    try{ const r=await api({action:"setDeadline", deadline:value}); D.thesisDeadline=r.thesisDeadline; D.thesisOpen=r.thesisOpen; viewThesis();
+      P.toast(value?`Deadline set: ${P.fmtDeadline(value)}`:"Deadline removed. Submissions are open."); }
+    catch(e){ P.toast(P.errText(e)); P.busy(b,false); }
+  };
+  $("#dlSave").onclick=()=>{ const d=$("#dlDate").value, t=$("#dlTime").value||"23:59"; if(!d) return P.toast(P.MSG.invalid_deadline); saveDl(`${d} ${t}`, $("#dlSave")); };
+  if($("#dlClear")) $("#dlClear").onclick=()=>saveDl("", $("#dlClear"));
   app.querySelectorAll("[data-f]").forEach(b=>b.onclick=()=>{ tFilter=b.dataset.f; viewThesis(); });
   app.querySelectorAll("[data-p]").forEach(b=>b.onclick=()=>{ tProg=b.dataset.p; viewThesis(); });
   $("#tpdf").onclick=async ()=>{
@@ -454,7 +478,7 @@ function viewThesis(){
     const L=thesisRows(); if(!L.length) return P.toast("No students to include.");
     const parts=[tProg!=="All"?tProg:"", tFilter==="Not submitted"?"Not Yet Submitted":""].filter(Boolean);
     const b=$("#tpdf"); P.busy(b,true,"Preparing");
-    try{ await RegisterPDF.thesisList({rows:L, title:"Student Thesis Topics"+(parts.length?" · "+parts.join(" · "):""), me:who(D.me||EMAIL)}); }
+    try{ await RegisterPDF.thesisList({rows:L, deadline:D.thesisDeadline?P.fmtDeadline(D.thesisDeadline):"", title:"Student Thesis Topics"+(parts.length?" · "+parts.join(" · "):""), me:who(D.me||EMAIL)}); }
     catch(e){ P.toast("Couldn't create the PDF."); }
     finally{ P.busy(b,false); }
   };

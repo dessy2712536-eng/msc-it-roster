@@ -40,7 +40,9 @@
     pin_weak:"That PIN is too easy to guess. Avoid repeated digits (111111) or runs (123456).",
     programme_required:"Choose MPhil or MSc.",
     topic_required:"Enter your thesis topic (at least 10 characters).",
-    invalid_status:"That status isn't valid."
+    invalid_status:"That status isn't valid.",
+    thesis_closed:"The deadline for thesis topics has passed, so submissions are closed. Contact the class rep if you need to make a change.",
+    invalid_deadline:"Pick a valid date and time for the deadline."
   };
   const errText = e => MSG[e && e.message] || MSG[e] || (e && e.name==="AbortError" ? MSG.network : (e instanceof TypeError ? MSG.network : MSG.network));
 
@@ -49,6 +51,12 @@
     const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(iso||""); if(!m) return iso||"";
     const d = new Date(+m[1], +m[2]-1, +m[3]);
     return long ? `${DAYS[d.getDay()]}, ${d.getDate()} ${MON[d.getMonth()]} ${d.getFullYear()}` : `${d.getDate()} ${MON[d.getMonth()]}`;
+  }
+  /* "2026-11-28 23:59" → "Sat, 28 Nov 2026 at 11:59 PM" */
+  function fmtDeadline(s){
+    const m=/^(\d{4}-\d{2}-\d{2})[ T](\d{2}):(\d{2})/.exec(s||""); if(!m) return s||"";
+    const h=+m[2], ap=h>=12?"PM":"AM", h12=h%12||12;
+    return `${fmtDate(m[1],true)} at ${h12}:${m[3]} ${ap}`;
   }
   function today(){ const d=new Date(); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`; }
 
@@ -99,5 +107,5 @@
   const pillClass = s => ({Present:"present",Absent:"absent",Excused:"excused"})[s] || "none";
   const initials = n => String(n).replace(/[^A-Za-z\s-]/g,"").split(/[\s-]+/).filter(Boolean).map(w=>w[0]).slice(0,2).join("").toUpperCase();
 
-  window.Portal = {API, configured, $, esc, call, errText, MSG, fmtDate, today, busy, toast, openSheet, closeSheet, mountLogo, EMAIL_RE, pillClass, initials};
+  window.Portal = {API, configured, $, esc, call, errText, MSG, fmtDate, fmtDeadline, today, busy, toast, openSheet, closeSheet, mountLogo, EMAIL_RE, pillClass, initials};
 })();
